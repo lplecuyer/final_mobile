@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity } from 'react-native';
 import BaseTemplate from './BaseTemplate';
 
-export default function User() {
+export default function UserMenu() {
 
   return (
     <View style={styles.background}>

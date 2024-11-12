@@ -10,7 +10,6 @@ export default function Login() {
   };
   return (
     <View style={styles.background}>
-      <BaseTemplate></BaseTemplate>
       <Text style={styles.bigText}>Login</Text>
       <Text style={styles.smallText}>Username</Text>
       <TextInput style={styles.textInput}></TextInput>

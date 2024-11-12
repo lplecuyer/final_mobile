@@ -25,14 +25,18 @@ styles = StyleSheet.create({
         flexDirection: "column",
     },
     tinytext: {
-        color: 'white',
-        borderColor: '#22262F',
-        borderWidth: 2,
-        width: '80%',
+        fontSize: 16,
+        color: '#B1B1AE',
         textAlign: 'center',
-        padding: 10,
-        marginTop: 30
     },
+    outline: {
+    position: 'absolute',
+    fontSize: 16,
+    color: '#22262F', // Couleur de contour
+    textShadowColor: '#22262F', // Couleur d'ombre (équivalente à la bordure)
+    textShadowOffset: { width: -1, height: 1 }, // Décalage pour l'épaisseur du contour
+    textShadowRadius: 2, // Rayon de flou pour adoucir le contour
+    },   
     title: {
         fontSize: 40,
         textAlign: 'center',

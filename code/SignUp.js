@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
 import BaseTemplate from './BaseTemplate';
 
-export default function SignUp() {
+export default function SignUp({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
@@ -15,7 +15,6 @@ export default function SignUp() {
 
   return (
     <View style={styles.background}>
-      <BaseTemplate />
       <Text style={styles.bigText}>SignUp</Text>
       <Text style={styles.smallText}>Username</Text>
       <TextInput
@@ -44,7 +43,7 @@ export default function SignUp() {
         onChangeText={setToken}
       />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={Login}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Main menu')}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>
