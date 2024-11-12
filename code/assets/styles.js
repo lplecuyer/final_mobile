@@ -2,9 +2,6 @@ import { StyleSheet } from 'react-native';
 
 
 styles = StyleSheet.create({
-    safeArea: {
-        alignContent: 'flex-start',
-    },
     header : {
         width: '100%',
         height: 150,
