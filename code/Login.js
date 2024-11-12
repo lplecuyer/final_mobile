@@ -1,6 +1,5 @@
 import React from 'react';
 import {StyleSheet, View, Text, TextInput, TouchableOpacity} from 'react-native';
-import BaseTemplate from './BaseTemplate';
 
 export default function Login() {
 
@@ -10,7 +9,6 @@ export default function Login() {
   };
   return (
     <View style={styles.background}>
-      <BaseTemplate></BaseTemplate>
       <Text style={styles.bigText}>Login</Text>
       <Text style={styles.smallText}>Username</Text>
       <TextInput style={styles.textInput}></TextInput>

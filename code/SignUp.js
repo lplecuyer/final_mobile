@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity } from 'react-native';
-import BaseTemplate from './BaseTemplate';
 
 export default function SignUp() {
   const [username, setUsername] = useState('');
@@ -15,7 +14,6 @@ export default function SignUp() {
 
   return (
     <View style={styles.background}>
-      <BaseTemplate />
       <Text style={styles.bigText}>SignUp</Text>
       <Text style={styles.smallText}>Username</Text>
       <TextInput

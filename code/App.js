@@ -6,7 +6,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MainMenu from './MainMenu.js';
 import Login from './Login.js';
 import SignUp from './SignUp.js';
-import User from './User.js';
+import User from './UserMenu.js';
+import BaseTemplate from './BaseTemplate.js';
 
 
 const Stack = createNativeStackNavigator();
@@ -16,7 +17,8 @@ export default function App()
 {
   return (
     <NavigationContainer>
-            <Stack.Navigator initialRouteName="MainMenu">
+      <BaseTemplate>
+            <Stack.Navigator initialRouteName="User">
 
                 <Stack.Screen
                     name="Main menu"
@@ -42,6 +44,7 @@ export default function App()
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
+      </BaseTemplate>
     </NavigationContainer>
   );
 }
