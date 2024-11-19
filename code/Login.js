@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, View, Text, TextInput, TouchableOpacity} from 'react-native';
 
-export default function Login() {
+export default function Login({navigation}) {
   return (
     <View style={styles.background}>
       <Text style={styles.bigText}>Login</Text>
@@ -11,7 +11,7 @@ export default function Login() {
       <TextInput style={styles.textInput}></TextInput>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={Login}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('GamesList')}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>

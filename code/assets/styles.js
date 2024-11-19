@@ -1,4 +1,6 @@
 import { StyleSheet } from 'react-native';
+import { SearchBar } from 'react-native-screens';
+import GamesList from '../GamesList';
 
 
 styles = StyleSheet.create({
@@ -25,14 +27,18 @@ styles = StyleSheet.create({
         flexDirection: "column",
     },
     tinytext: {
-        color: 'white',
-        borderColor: '#22262F',
-        borderWidth: 2,
-        width: '80%',
+        fontSize: 16,
+        color: '#B1B1AE',
         textAlign: 'center',
-        padding: 10,
-        marginTop: 30
     },
+    outline: {
+    position: 'absolute',
+    fontSize: 16,
+    color: '#22262F', // Couleur de contour
+    textShadowColor: '#22262F', // Couleur d'ombre (équivalente à la bordure)
+    textShadowOffset: { width: -1, height: 1 }, // Décalage pour l'épaisseur du contour
+    textShadowRadius: 2, // Rayon de flou pour adoucir le contour
+    },   
     title: {
         fontSize: 40,
         textAlign: 'center',
@@ -79,6 +85,33 @@ styles = StyleSheet.create({
     icon: {
         width: 60,
         height: 40,
+    },
+    separator: {
+        height: 1,
+        width: "auto",
+        borderWidth: 1,
+        borderColor: "#B1B1AE",
+        marginVertical: 30
+    },
+    background: {
+        backgroundColor: '#343C53',
+        flex: 1,
+        alignItems: 'center',
+    },
+    SearchBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f0f0f1',
+        borderRadius: 10,
+        borderWidth: 1,
+        width: '100%',
+        height: "80%"
+    },
+    Game: {
+        width: 140,
+        height: 200,
+        marginTop: 20,
+        marginHorizontal: 30
     }
 });
 

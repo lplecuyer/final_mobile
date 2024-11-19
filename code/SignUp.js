@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity } from 'react-native';
 
-export default function SignUp() {
+export default function SignUp({navigation}) {
+const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [token, setToken] = useState('');
 
+  const Login = () => {
+    // Handle sign-up logic here
+    console.log({ username, password, passwordConfirmation, token });
+  };
   return (
     <View style={styles.background}>
       <Text style={styles.bigText}>SignUp</Text>
@@ -33,7 +41,7 @@ export default function SignUp() {
         onChangeText={setToken}
       />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={Login}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Main menu')}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>

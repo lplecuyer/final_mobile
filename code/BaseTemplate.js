@@ -3,10 +3,10 @@ import { SafeAreaView, StatusBar, View, Image, Text, TouchableOpacity } from 're
 import { useNavigation } from '@react-navigation/native';
 import styles from './assets/styles.js';
 
-export default function BaseTemplate({ children}) {
+export default function BaseTemplate({ children }) {
     const navigation = useNavigation();
     return (
-        <SafeAreaView style={{ borderWidth: 10, flexGrow: 1}}>
+        <SafeAreaView style={{ flexGrow: 1}}>
             <StatusBar barStyle="light-content" backgroundColor="#121212" />
             <View style={[styles.header, {elevation: 10}]}>
                 <TouchableOpacity  onPress={() => navigation.navigate('Main menu')}>
