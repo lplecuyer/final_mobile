@@ -2,15 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity } from 'react-native';
 
 export default function SignUp() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
-  const [token, setToken] = useState('');
-
-  const Login = () => {
-    // Handle sign-up logic here
-    console.log({ username, password, passwordConfirmation, token });
-  };
 
   return (
     <View style={styles.background}>

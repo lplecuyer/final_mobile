@@ -2,11 +2,6 @@ import React from 'react';
 import {StyleSheet, View, Text, TextInput, TouchableOpacity} from 'react-native';
 
 export default function Login() {
-
-    const Login = () => {
-    // Handle sign-up logic here
-    console.log({ username, password, passwordConfirmation, token });
-  };
   return (
     <View style={styles.background}>
       <Text style={styles.bigText}>Login</Text>

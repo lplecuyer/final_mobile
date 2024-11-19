@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     width: 90,
     height: 40,
     marginTop: 10,
-    marginRight: 10,
+    marginLeft: 15,
   },
   reviewContainerContainer:
   {

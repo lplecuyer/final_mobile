@@ -1,10 +1,12 @@
 import React from 'react';
 import {StyleSheet, View, Text, TextInput, TouchableOpacity, FlatList} from 'react-native';
-const numbers = [...Array(5)]
+import NavigationTemplate from './NavigationTemplate.js';
+const numbers = [...Array(15)]
 export default function Review() {
   return (
     <View style={styles.background}>
         <View style={styles.reviewcontainer}>
+            <Text style={styles.username}>Charles</Text>
             <Text style={styles.bigText}>Ce jeux est le pire que j'ai jamais joué</Text>
             <Text style={styles.smallText}>reviewreviewreviewreviewreview</Text>
         </View>
@@ -13,11 +15,13 @@ export default function Review() {
             renderItem={ () => {
                 return (
                 <View style={styles.commentcontainer}>
+                    <Text style={styles.username}>Random rageux</Text>
                     <Text style={styles.smallText}>Tu n'as pas raison, t'est une grosse merde et tu mérite de mourrir pour avoir dit ça</Text>
                 </View>
                 )
             }}
         />
+        <NavigationTemplate></NavigationTemplate>
     </View>
   );
 }
@@ -32,15 +36,20 @@ const styles = StyleSheet.create({
   bigText: {
     color: '#C5C3C0',
     fontWeight: 'bold',
-    fontSize: 35,
+    fontSize: 30,
     alignContent: 'center',
     marginTop: 25,
   },
   smallText: {
     color: '#B1B1AE',
     marginRight: 100,
-    marginTop: 50,
+    marginTop: 20,
+    fontSize: 15,
+  },
+  username: {
     fontSize: 20,
+    color: 'black',
+    fontWeight: 'bold',
   },
   reviewcontainer: {
     backgroundColor: 'grey',
