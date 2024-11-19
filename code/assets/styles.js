@@ -69,6 +69,17 @@ styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    navigationContainer: {
+        backgroundColor: '#22262F',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        height: 40
+    },
+    icon: {
+        width: 60,
+        height: 40,
+    }
 });
 
 export default styles

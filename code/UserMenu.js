@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity, Image, FlatList } from 'react-native';
 
+import NavigationTemplate from './NavigationTemplate.js';
+
 const gameNumbers = [...Array(10)]
 const reviewNumbers = [...Array(50)]
 export default function UserMenu() {
@@ -46,6 +48,8 @@ export default function UserMenu() {
                 )
             }}
         />
+
+      <NavigationTemplate></NavigationTemplate>
     </View>
   );
 }
