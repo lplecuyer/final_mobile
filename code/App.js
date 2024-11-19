@@ -7,6 +7,7 @@ import SignUp from './SignUp.js';
 import UserMenu from './UserMenu.js';
 import BaseTemplate from './BaseTemplate.js';
 import UserToken from './UserToken.js';
+import GamesList from './GamesList.js';
 
 
 const Stack = createNativeStackNavigator();
@@ -52,6 +53,12 @@ export default function App()
           <Stack.Screen
               name="BaseTemplate"
               component={ BaseTemplate }
+              options={{ headerShown: false }}
+          />
+
+          <Stack.Screen
+              name="GamesList"
+              component={ GamesList }
               options={{ headerShown: false }}
           />
 

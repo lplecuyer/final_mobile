@@ -1,4 +1,6 @@
 import { StyleSheet } from 'react-native';
+import { SearchBar } from 'react-native-screens';
+import GamesList from '../GamesList';
 
 
 styles = StyleSheet.create({
@@ -73,6 +75,33 @@ styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    separator: {
+        height: 1,
+        width: "auto",
+        borderWidth: 1,
+        borderColor: "#B1B1AE",
+        marginVertical: 30
+    },
+    background: {
+        backgroundColor: '#343C53',
+        flex: 1,
+        alignItems: 'center',
+    },
+    SearchBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f0f0f1',
+        borderRadius: 10,
+        borderWidth: 1,
+        width: '100%',
+        height: "80%"
+    },
+    Game: {
+        width: 140,
+        height: 200,
+        marginTop: 20,
+        marginHorizontal: 30
+    }
 });
 
 export default styles

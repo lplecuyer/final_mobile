@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import BaseTemplate from './BaseTemplate.js';
 import styles from './assets/styles.js';
 
 export default function MainMenu({navigation}) {
