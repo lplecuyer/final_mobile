@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity, Image } from 'react-native';
-import { ScrollView } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity, Image, FlatList } from 'react-native';
 
+const gameNumbers = [...Array(10)]
+const reviewNumbers = [...Array(50)]
 export default function UserMenu() {
 
   return (
@@ -19,25 +20,32 @@ export default function UserMenu() {
         
         <View style={styles.reviewContainerContainer}>
           <Text style={[styles.smallText, { marginLeft: 0 }]}>Reviews</Text>
-          <ScrollView>
             <View style={styles.reviewContainer}>
-              <Image source={require('./assets/User_Icon.png')} style={styles.review} />
-              <Image source={require('./assets/User_Icon.png')} style={styles.review} />
-              <Image source={require('./assets/User_Icon.png')} style={styles.review} />
-              <Image source={require('./assets/User_Icon.png')} style={styles.review} />
-              <Image source={require('./assets/User_Icon.png')} style={styles.review} />
-              <Image source={require('./assets/User_Icon.png')} style={styles.review} />
+              <FlatList numColumns={2}
+              data={ reviewNumbers }
+                renderItem={ () => {
+                  return (
+                    <Image source={require('./assets/User_Icon.png')} style={styles.review} />
+                  )
+                }}
+              />
             </View>
-          </ScrollView>
         </View>
       </View>
 
       <Text style={styles.bigText}>My Games</Text>
 
-      <View style={styles.gameContainer}>
-        <Image source={require('./assets/User_Icon.png')} style={styles.gameIcon} />
-        <Text style={styles.smallText}>Game name</Text>
-      </View>
+      <FlatList style={styles.gameList}
+      data={ gameNumbers }
+            renderItem={ () => {
+                return (
+                <View style={styles.gameContainer}>
+                  <Image source={require('./assets/User_Icon.png')} style={styles.gameIcon} />
+                  <Text style={styles.smallText}>Game name</Text>
+                </View>
+                )
+            }}
+        />
     </View>
   );
 }
@@ -89,9 +97,9 @@ const styles = StyleSheet.create({
   reviewContainer:
   {
     width: '100%',
-    flexWrap: 'wrap',
     justifyContent: 'space-around',
     flexDirection: 'row',
+    height: '80%',
   },
   review: {
     width: 90,
@@ -108,16 +116,19 @@ const styles = StyleSheet.create({
   },
   gameContainer: {
     backgroundColor: '#535353',
-    width: '90%',
-    height: '12%',
-    elevation: 30,
+    width: '400%',
+    height: 60,
     justifyContent: "flex-start",
     flexDirection: 'row',
     top: 10,
+    marginBottom: 10,
   },
   gameIcon: {
     marginLeft: 10,
     margin: 7,
     height: 'auto',
   },
+  gameList: {
+    width: '90%'
+  }
 });

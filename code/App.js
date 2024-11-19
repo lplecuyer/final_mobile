@@ -8,6 +8,7 @@ import Login from './Login.js';
 import SignUp from './SignUp.js';
 import User from './UserMenu.js';
 import BaseTemplate from './BaseTemplate.js';
+import Review from './Review.js';
 
 
 const Stack = createNativeStackNavigator();
@@ -41,6 +42,12 @@ export default function App()
                 <Stack.Screen
                     name="User"
                     component={ User }
+                    options={{ headerShown: false }}
+                />
+
+                <Stack.Screen
+                    name="Review"
+                    component={ Review }
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
