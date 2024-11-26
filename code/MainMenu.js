@@ -1,8 +1,23 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import styles from './assets/styles.js';
+import AuthService from './SteamService.js';
 
 export default function MainMenu({navigation}) {
+    const handleSignUp = async () => {
+        const APIKEY = 'DC8DD54601F99078367C3B2305FFC527'; 
+        const USERID = '76561198873701365';
+        const GAMEID = '739630';
+
+        try {
+            const result = await AuthService.GetAchievementsByGameForUser(APIKEY, USERID, GAMEID);
+            console.log('Résultat', result);
+        } catch (error) {
+            console.error('Erreur lors de l’appel API:', error);
+            console.log('Erreur', 'Impossible de récupérer les informations utilisateur.');
+        }
+    };
+
     return (
         <View style={{ justifyContent: 'flex-start', alignItems: 'center', backgroundColor: '#343C53', flex: 1 }}>
             <Text style={ styles.title }>
@@ -14,7 +29,7 @@ export default function MainMenu({navigation}) {
                 </Text>
 
                 <View style={{flexDirection: "row", justifyContent: "space-between", marginBottom: 10, width: "60%", marginTop: 20}}>
-                    <TouchableOpacity style={styles.ButtonMenu} onPress={() => navigation.navigate('SignUp')}>
+                    <TouchableOpacity style={styles.ButtonMenu} onPress={handleSignUp}>
                         <Text style={styles.textButtonMenu}>Sign up</Text>
                     </TouchableOpacity>
 
