@@ -1,18 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {StyleSheet, View, Text, TextInput, TouchableOpacity} from 'react-native';
 import AuthService from './authentification/AuthService';
+import GamesList from './GamesList';
+
 
 export default function Login({navigation}) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const handleSignUp = async () => {
+    const credentials = {username, password}
+        console.log(username)
+        console.log(password)
+        try {
+            const result = await AuthService.logIn(credentials);
+            console.log('Résultat', result);
+            if (result != null) {
+              navigation.navigate('GamesList');
+            }
+        } catch (error) {
+            console.error('Erreur lors de l’appel API:', error);
+            console.log('Erreur', 'Impossible de récupérer les informations utilisateur.');
+        }
+    };
   return (
     <View style={styles.background}>
       <Text style={styles.bigText}>Login</Text>
       <Text style={styles.smallText}>Username</Text>
-      <TextInput style={styles.textInput}></TextInput>
+      <TextInput
+        style={styles.textInput}
+        value={username}
+        onChangeText={setUsername}
+      />
       <Text style={styles.smallText}>Password</Text>
-      <TextInput style={styles.textInput}></TextInput>
+      <TextInput
+        style={styles.textInput}
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+      />
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('GamesList')}>
+        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>
