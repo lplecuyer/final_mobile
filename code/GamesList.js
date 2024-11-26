@@ -37,7 +37,6 @@ export default function GamesList({ navigation }) {
                 </View>
             </View>
             <View style={[styles.separator, { width: "100%", marginTop: 10 }]} />
-            <View style={styles.FlatList}>
                 <FlatList numColumns={2}
                     contentContainerStyle={{ paddingBottom: 250 }}
                     data={gameNumbers}
@@ -50,7 +49,6 @@ export default function GamesList({ navigation }) {
                         )
                     }}
                 />
-            </View>
             <NavigationTemplate />
         </View>
     );

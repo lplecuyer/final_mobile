@@ -10,16 +10,14 @@ import Review from './Review.js';
 import UserToken from './UserToken.js';
 import GamesList from './GamesList.js';
 
-
 const Stack = createNativeStackNavigator();
-
 
 export default function App() 
 {
   return (
     <NavigationContainer>
       <BaseTemplate>
-        <Stack.Navigator initialRouteName="User">
+        <Stack.Navigator initialRouteName="MainMenu">
 
           <Stack.Screen
               name="Main menu"
@@ -50,6 +48,7 @@ export default function App()
                     component={ Review }
                     options={{ headerShown: false }}
                 />
+                
           <Stack.Screen
               name="SignUp"
               component={ SignUp }
@@ -73,4 +72,5 @@ export default function App()
     </NavigationContainer>
   );
 }
+
 

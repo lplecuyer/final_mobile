@@ -8,7 +8,7 @@ export default function NavigationTemplate({ children}) {
     return (
         <SafeAreaView style={{width: '100%'}}>
             <View style={styles.navigationContainer}>
-                <TouchableOpacity  onPress={() => navigation.navigate('Review')}>
+                <TouchableOpacity  onPress={() => navigation.navigate('GamesList')}>
                     <Image source={require('./assets/Game_list.png')} style={styles.icon}/>
                 </TouchableOpacity>
                 <TouchableOpacity  onPress={() => navigation.navigate('Login')}>
