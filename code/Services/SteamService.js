@@ -22,7 +22,7 @@ class SteamService {
 
     async GetAllSteamGames(APIKEY) {
         try {
-            const response = await fetch(`https://api.steampowered.com/IStoreService/GetAppList/v1/?key=${APIKEY}&max_results=5`, {
+            const response = await fetch(`https://api.steampowered.com/IStoreService/GetAppList/v1/?key=${APIKEY}&max_results=1000`, {
                 method: 'GET', // L'API attend une requête GET
             });
 
@@ -36,7 +36,7 @@ class SteamService {
                 throw new Error("Aucun utilisateur trouvé avec cet ID.");
             }
         } catch (error) {
-            console.error("Erreur lors de l'appel API:", error.message);
+            console.error("Erreur lors de l'appel API1:", error.message);
             throw error; // Relance l'erreur pour la gestion dans le composant
         }
     }
@@ -86,19 +86,40 @@ class SteamService {
     async GetGameInfo(GAMEID) {
         try {
             const response = await fetch(`https://store.steampowered.com/api/appdetails?appids=${GAMEID}`);
+    
+            // Vérifie si le statut HTTP est 200
+            if (!response.ok) {
+                console.warn(`Impossible d'accéder au jeu ID: ${GAMEID}. Statut HTTP: ${response.status}`);
+                return null; // Retourne null si l'accès est refusé ou si une autre erreur survient
+            }
+    
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                console.warn(`Réponse non JSON pour le jeu ID: ${GAMEID}`);
+                return null; // Skip les jeux non disponibles
+            }
+    
             const data = await response.json();
-   
-            // Vérifier si la clé 'data' existe dans la réponse
+    
+            // Vérifie si le jeu a des données valides
             if (data[GAMEID]?.success) {
-                return data[GAMEID].data.header_image;  // Accéder au nom du jeu
+                if (data[GAMEID].data?.header_image) {
+                    return data[GAMEID].data.header_image;  
+                } else {
+                    console.warn(`Le jeu avec l'ID ${GAMEID} n'a pas d'image.`);
+                    return null; // Skip si pas d'image
+                }
             } else {
-                throw new Error("Aucun jeu trouvé avec cet ID.");
+                console.warn(`Aucun jeu trouvé avec l'ID ${GAMEID}.`);
+                return null; // Skip si le jeu est invalide
             }
         } catch (error) {
-            console.error("Erreur lors de l'appel API:", error.message);
-            throw error; // Relance l'erreur pour la gestion dans le composant
+            console.error(`Erreur lors de l'appel API pour le jeu ID ${GAMEID}:`, error.message);
+            return null; // Skip en cas d'erreur
         }
     }
+    
+    
    
 
 }
