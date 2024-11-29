@@ -8,6 +8,7 @@ import UserMenu from './UserMenu.js';
 import BaseTemplate from './BaseTemplate.js';
 import UserToken from './UserToken.js';
 import GamesList from './GamesList.js';
+import ReviewsList from './ReviewsList.js';
 
 
 const Stack = createNativeStackNavigator();
@@ -59,6 +60,12 @@ export default function App()
           <Stack.Screen
               name="GamesList"
               component={ GamesList }
+              options={{ headerShown: false }}
+          />
+
+          <Stack.Screen
+              name="ReviewsList"
+              component={ ReviewsList }
               options={{ headerShown: false }}
           />
 

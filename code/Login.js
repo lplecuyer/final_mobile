@@ -24,7 +24,6 @@ export default function Login({navigation}) {
   );
 }
 
-
 const styles = StyleSheet.create({
   background: {
     backgroundColor: '#343C53',

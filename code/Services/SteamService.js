@@ -22,15 +22,15 @@ class SteamService {
 
     async GetAllSteamGames(APIKEY) {
         try {
-            const response = await fetch(`https://api.steampowered.com/IStoreService/GetAppList/v1/?key=${APIKEY}`, {
+            const response = await fetch(`https://api.steampowered.com/IStoreService/GetAppList/v1/?key=${APIKEY}&max_results=5`, {
                 method: 'GET', // L'API attend une requête GET
             });
 
             const data = await response.json();
 
             if (data.response && data.response.apps.length > 0) {
-                // Si des joueurs sont retournés
-                return data.response.apps; // Retourne les informations du premier joueur
+                // Parcourt le tableau et récupère les noms des applications
+                return data.response.apps
             } else {
                 // Aucun utilisateur trouvé
                 throw new Error("Aucun utilisateur trouvé avec cet ID.");
@@ -90,7 +90,7 @@ class SteamService {
    
             // Vérifier si la clé 'data' existe dans la réponse
             if (data[GAMEID]?.success) {
-                return data[GAMEID].data.name;  // Accéder au nom du jeu
+                return data[GAMEID].data.header_image;  // Accéder au nom du jeu
             } else {
                 throw new Error("Aucun jeu trouvé avec cet ID.");
             }
@@ -103,5 +103,5 @@ class SteamService {
 
 }
 
-const AuthService = new SteamService();
-export default AuthService;
+const ShtweamService = new SteamService();
+export default ShtweamService;

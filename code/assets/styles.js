@@ -100,7 +100,8 @@ styles = StyleSheet.create({
         width: 140,
         height: 200,
         marginTop: 20,
-        marginHorizontal: 30
+        marginHorizontal: 30,
+        resizeMode: 'stretch'
     }
 });
 
