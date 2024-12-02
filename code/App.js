@@ -17,7 +17,7 @@ export default function App()
   return (
     <NavigationContainer>
       <BaseTemplate>
-        <Stack.Navigator initialRouteName="MainMenu">
+        <Stack.Navigator initialRouteName="Main menu">
 
           <Stack.Screen
               name="Main menu"
