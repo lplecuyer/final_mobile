@@ -15,8 +15,8 @@ export default function GamesList({ navigation }) {
         async function fetchGames() {
             const games = await Get_all_games();
             setGameNames(games);
-            setFilteredGames(games); // Initial list
-            setIsLoading(false); // Terminé le chargement
+            setFilteredGames(games);
+            setIsLoading(false);
         }
         fetchGames();
     }, []);
