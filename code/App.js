@@ -4,22 +4,21 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MainMenu from './MainMenu.js';
 import Login from './Login.js';
 import SignUp from './SignUp.js';
-import UserMenu from './UserMenu.js';
+import User from './UserMenu.js';
 import BaseTemplate from './BaseTemplate.js';
+import Review from './Review.js';
 import UserToken from './UserToken.js';
 import GamesList from './GamesList.js';
 import ReviewsList from './ReviewsList.js';
 
-
 const Stack = createNativeStackNavigator();
-
 
 export default function App() 
 {
   return (
     <NavigationContainer>
       <BaseTemplate>
-        <Stack.Navigator initialRouteName="MainMenu">
+        <Stack.Navigator initialRouteName="Main menu">
 
           <Stack.Screen
               name="Main menu"
@@ -39,15 +38,21 @@ export default function App()
               options={{ headerShown: false }}
           />
 
+                <Stack.Screen
+                    name="User"
+                    component={ User }
+                    options={{ headerShown: false }}
+                />
+
+                <Stack.Screen
+                    name="Review"
+                    component={ Review }
+                    options={{ headerShown: false }}
+                />
+                
           <Stack.Screen
               name="SignUp"
               component={ SignUp }
-              options={{ headerShown: false }}
-          />
-
-          <Stack.Screen
-              name="User menu"
-              component={ UserMenu }
               options={{ headerShown: false }}
           />
 
@@ -74,4 +79,5 @@ export default function App()
     </NavigationContainer>
   );
 }
+
 

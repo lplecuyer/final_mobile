@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import styles from './assets/styles.js';
+import NavigationTemplate from './NavigationTemplate.js';
 import ShtweamService from './Services/SteamService.js';
 
 export default function GamesList({ navigation }) {
@@ -9,7 +10,7 @@ export default function GamesList({ navigation }) {
     const [searchText, setSearchText] = useState("");
     const [gameNames, setGameNames] = useState([]);
     const [filteredGames, setFilteredGames] = useState([]);
-    const [isLoading, setIsLoading] = useState(true); // Nouvel état pour le chargement
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         async function fetchGames() {
@@ -54,7 +55,6 @@ export default function GamesList({ navigation }) {
         <View style={styles.background}>
             <Text style={[styles.title, { marginTop: 30 }]}> Games List </Text>
 
-            {/* Afficher "Loading..." si isLoading est vrai */}
             {isLoading ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <ActivityIndicator size="large" color="#ffffff" />
@@ -62,7 +62,6 @@ export default function GamesList({ navigation }) {
                 </View>
             ) : (
                 <>
-                    {/* Affichage principal une fois le chargement terminé */}
                     <View style={{ flexDirection: "row", justifyContent: "center", width: "100%", height: 50, marginTop: 30 }}>
                         <View style={{ flexDirection: "row", width: "50%", alignItems: "center", justifyContent: "center", paddingHorizontal: 10 }}>
                             <Picker
@@ -87,29 +86,26 @@ export default function GamesList({ navigation }) {
                         </View>
                     </View>
                     <View style={[styles.separator, { width: "100%", marginTop: 10 }]} />
-                    <View style={styles.FlatList}>
-                        <FlatList
-                            numColumns={2}
-                            contentContainerStyle={{ paddingBottom: 250 }}
-                            data={filteredGames}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={({ item }) => {
-                                return (
-                                    <View style={{ alignContent: 'center', flexDirection: "column", justifyContent: "center" }}>
-                                        <TouchableOpacity onPress={() => navigation.navigate('ReviewsList', { gameid: item.appid })}>
-                                            <Image
-                                                source={{ uri: item.image }}
-                                                style={styles.Game}
-                                            />
-                                        </TouchableOpacity>
-                                        <Text style={[styles.tinytext, { textAlign: "center", marginBottom: 10, maxWidth: 200, flexWrap: 'wrap', height: 50 }]}>
-                                            {item.name}
-                                        </Text>
-                                    </View>
-                                );
-                            }}
-                        />
-                    </View>
+                    <FlatList
+                        numColumns={2}
+                        contentContainerStyle={{ paddingBottom: 250 }}
+                        data={filteredGames}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item }) => (
+                            <View style={{ alignContent: 'center', flexDirection: "column", justifyContent: "center" }}>
+                                <TouchableOpacity onPress={() => navigation.navigate('ReviewsList', { gameid: item.appid })}>
+                                    <Image
+                                        source={{ uri: item.image }}
+                                        style={styles.Game}
+                                    />
+                                </TouchableOpacity>
+                                <Text style={[styles.tinytext, { textAlign: "center", marginBottom: 10, maxWidth: 200, flexWrap: 'wrap', height: 50 }]}>
+                                    {item.name}
+                                </Text>
+                            </View>
+                        )}
+                    />
+                    <NavigationTemplate />
                 </>
             )}
         </View>
@@ -117,37 +113,20 @@ export default function GamesList({ navigation }) {
 
     async function Get_all_games() {
         const APIKEY = 'DC8DD54601F99078367C3B2305FFC527';
-        const BATCH_SIZE = 100;
-        let gamesWithImages = [];
-
         const result = await ShtweamService.GetAllSteamGames(APIKEY);
 
-        for (let i = 0; i < result.length; i += BATCH_SIZE) {
-            const batch = result.slice(i, i + BATCH_SIZE);
+        const games = await Promise.all(
+            result.map(async (game) => {
+                const gameInfo = await ShtweamService.GetGameInfo(game.appid);
 
-            const gamesBatch = await Promise.all(
-                batch.map(async (game) => {
-                    let image = await get_game_image(game.appid);
+                return {
+                    name: gameInfo?.name || game.name,
+                    appid: game.appid,
+                    image: gameInfo?.header_image || 'https://static.vecteezy.com/system/resources/previews/004/141/669/original/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg',
+                };
+            })
+        );
 
-                    if (!image) {
-                        image = 'https://static.vecteezy.com/system/resources/previews/004/141/669/original/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg';
-                    }
-                    return {
-                        name: game.name,
-                        appid: game.appid,
-                        image,
-                    };
-                })
-            );
-
-            gamesWithImages = [...gamesWithImages, ...gamesBatch];
-        }
-
-        return gamesWithImages;
-    }
-
-    async function get_game_image(gameid) {
-        const result = await ShtweamService.GetGameInfo(gameid);
-        return result;
+        return games;
     }
 }

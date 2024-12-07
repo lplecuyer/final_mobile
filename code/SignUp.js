@@ -1,19 +1,35 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
-import BaseTemplate from './BaseTemplate';
+import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity, ScrollView } from 'react-native';
+import AuthService from'./authentification/AuthService.js'
 
-export default function SignUp({ navigation }) {
+
+
+export default function SignUp({navigation}) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [token, setToken] = useState('');
+  const [steamId, setSteamId] = useState('');
 
-  const Login = () => {
-    // Handle sign-up logic here
-    console.log({ username, password, passwordConfirmation, token });
+  const handleSignUp = () => {
+    if (password !== passwordConfirmation) {
+      alert('Passwords do not match!');
+      return;
+    }
+
+    const credentials = { username, password };
+
+    const isSignedUp = AuthService.signUp(credentials);
+
+    if (isSignedUp) {
+      alert('Sign up successful!');
+      navigation.navigate('Main menu'); // Adjust according to your app navigation flow.
+    } else {
+      alert('Sign up failed! Username might already be taken.');
+    }
   };
-
   return (
+    <ScrollView>
     <View style={styles.background}>
       <Text style={styles.bigText}>SignUp</Text>
       <Text style={styles.smallText}>Username</Text>
@@ -42,12 +58,19 @@ export default function SignUp({ navigation }) {
         value={token}
         onChangeText={setToken}
       />
+      <Text style={styles.smallText}>Steam Id</Text>
+      <TextInput
+        style={styles.textInput}
+        value={steamId}
+        onChangeText={setSteamId}
+      />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Main menu')}>
-          <Text style={styles.buttonText}>Login</Text>
+        <TouchableOpacity style={styles.button} onPress={() => handleSignUp()} >
+          <Text style={styles.buttonText}>SignUp</Text>
         </TouchableOpacity>
       </View>
     </View>
+    </ScrollView>
   );
 }
 
@@ -62,34 +85,37 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 50,
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: 25,
   },
   smallText: {
     color: '#B1B1AE',
-    marginTop: 25,
+    marginTop: 50,
     fontSize: 20,
     width: '50%',
     textAlign: 'left',
   },
   textInput: {
-    height: 35,
+    height: 40,
     width: '50%',
     backgroundColor: '#27516C',
     borderColor: '#2a498c',
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 8,
-    marginTop: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
   },
   buttonContainer: {
-    marginTop: 30,
-    borderRadius: 20,
+    marginTop: 50,
+    borderRadius: 50,
   },
   button: {
     backgroundColor: '#4BB50D',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
+    marginBottom: 25,
   },
   buttonText: {
     color: '#B5FA74',
