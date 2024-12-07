@@ -27,8 +27,23 @@ class ReviewsService {
             console.error("Erreur réseau ou serveur :", error);
             return false;
         }
-
             return this.#reviewsList;
+    }
+
+    async CreateReview(newReview) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/create-new-review/execute", {
+            method: 'POST',
+            body: JSON.stringify({ newReview }),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        if (response.success){
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 const ReviewService = new ReviewsService();

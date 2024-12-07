@@ -48,21 +48,26 @@ class GamesService {
         }
     }
 
-    async GetGameNameById(game_id) {
+    async GetGameById(steam_game_id) {
         const response = await fetch("http://martha.jh.shawinigan.info/queries/select-game-by-id/execute", {
             method: 'POST',
-            body: JSON.stringify(game_id),
+            body: JSON.stringify({steam_game_id}),
             headers: {
                 'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
             }
         }).then((r) => r.json());
 
+        
+
         if (response.success){
-            return response.data.name;
+            const game = response.data[0];
+            return game;
         } else {
             console.warn("something wrong happened");
         }
+        
     }
+    
 
     async GetAllGames() {
         const response = await fetch("http://martha.jh.shawinigan.info/queries/select-all-games/execute", {

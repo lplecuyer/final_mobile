@@ -121,6 +121,18 @@ styles = StyleSheet.create({
         backgroundColor: '#000', // Change selon ton design
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    textInput: {
+        height: 40,
+        width: '50%',
+        backgroundColor: '#27516C',
+        borderColor: '#2a498c',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,
     }
     
 });

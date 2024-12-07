@@ -1,29 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { AirbnbRating } from 'react-native-ratings';
+import React, { useState, useEffect, useCallback } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, Alert, TextInput } from 'react-native';
+import { Rating } from '@kolking/react-native-rating';
 import styles from './assets/styles.js';
 import ReviewService from './Services/ReviewsService.js';
-import GameService from './Services/GamesService.js'; // Assurez-vous que GameService est importé correctement
+import GameService from './Services/GamesService.js';
+import AuthService from './authentification/AuthService.js';
 
 export default function ReviewCreate({ navigation, route }) {
     const { gameid } = route.params;
 
+    const loggedInUser = AuthService.currentUser;
+
     // State pour les champs du formulaire
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [rating, setRating] = useState(5); // Note par défaut
+    const [rating, setRating] = useState(4.0);
     const [gameName, setGameName] = useState('');
+    const [gameId, setGameId] = useState('');
 
     // Fonction pour récupérer le nom du jeu
     const fetchGameName = async () => {
         try {
-            const name = await GameService.GetGameNameById(gameid);
-            if (name) {
-                setGameName(name); // Mettre à jour le nom du jeu dans le state
+            const game = await GameService.GetGameById(gameid);
+            if (game) {
+                setGameName(game.name);
+                setGameId(game.id);
             }
         } catch (error) {
             console.error("Erreur lors de la récupération du nom du jeu :", error);
-            Alert.alert("Erreur", "Impossible de récupérer le nom du jeu.");
         }
     };
 
@@ -31,6 +35,9 @@ export default function ReviewCreate({ navigation, route }) {
     useEffect(() => {
         fetchGameName();
     }, [gameid]);
+
+    // Fonction pour gérer le changement de note
+    const handleChange = useCallback((newRating) => setRating(newRating), []);
 
     // Fonction pour gérer la soumission du formulaire
     const handleSubmit = async () => {
@@ -40,9 +47,10 @@ export default function ReviewCreate({ navigation, route }) {
         }
 
         const newReview = {
-            game_id: gameid,
+            user_id: loggedInUser.id,
+            game_id: gameId,
             title,
-            content: description,
+            description,
             rating,
         };
 
@@ -62,29 +70,27 @@ export default function ReviewCreate({ navigation, route }) {
     };
 
     return (
-        <View style={[styles.background, { flex: 1, padding: 20 }]}>            
-            <Text style={styles.title}>Ajouter une review pour le jeu "{gameName || 'chargement...'}"</Text>
+        <View style={[styles.background, { flex: 1, padding: 20 }]}>
+            <Text style={[styles.tinytext, { fontSize: 18 }]}>
+                Ajouter une review pour le jeu {'\n'}"{gameName || 'Chargement...'}"
+            </Text>
 
-            <Text style={styles.label}>Note :</Text>
-            <AirbnbRating
-                defaultRating={5}
-                size={30}
-                onFinishRating={setRating}
-            />
+            <Rating  scale={1.5} baseColor='black' fillColor='white' touchColor='white' rating={rating} onChange={handleChange} />
 
             <TextInput
-                style={localStyles.input}
-                placeholder="Titre"
+                style={[styles.textInput, { width: '90%', color: '#B1B1AE', fontSize: 16, height: 50 }]}
+                placeholder="Review Title"
                 value={title}
                 onChangeText={setTitle}
             />
 
             <TextInput
-                style={[localStyles.input, { height: 100, textAlignVertical: 'top' }]}
-                placeholder="Description"
+                style={[styles.textInput, {color: '#B1B1AE', height: '60%', width: '90%', textAlignVertical: "top"}]}
+                placeholder='description'
                 value={description}
                 onChangeText={setDescription}
-                multiline
+                multiline={true}
+                numberOfLines={40}
             />
 
             <TouchableOpacity style={localStyles.button} onPress={handleSubmit}>
