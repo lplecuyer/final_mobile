@@ -4,6 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import styles from './assets/styles.js';
 import NavigationTemplate from './NavigationTemplate.js';
 import ShtweamService from './Services/SteamService.js';
+import GameService from './Services/GamesService.js';
 
 export default function GamesList({ navigation }) {
     const [selectedFilter, setSelectedFilter] = useState("OrderAZ");
@@ -93,9 +94,9 @@ export default function GamesList({ navigation }) {
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({ item }) => (
                             <View style={{ alignContent: 'center', flexDirection: "column", justifyContent: "center" }}>
-                                <TouchableOpacity onPress={() => navigation.navigate('ReviewsList', { gameid: item.appid })}>
+                                <TouchableOpacity onPress={() => navigation.navigate('ReviewsList', { gameid: item.steam_game_id })}>
                                     <Image
-                                        source={{ uri: item.image }}
+                                        source={{ uri: item.image_url }}
                                         style={styles.Game}
                                     />
                                 </TouchableOpacity>
@@ -112,21 +113,7 @@ export default function GamesList({ navigation }) {
     );
 
     async function Get_all_games() {
-        const APIKEY = 'DC8DD54601F99078367C3B2305FFC527';
-        const result = await ShtweamService.GetAllSteamGames(APIKEY);
-
-        const games = await Promise.all(
-            result.map(async (game) => {
-                const gameInfo = await ShtweamService.GetGameInfo(game.appid);
-
-                return {
-                    name: gameInfo?.name || game.name,
-                    appid: game.appid,
-                    image: gameInfo?.header_image || 'https://static.vecteezy.com/system/resources/previews/004/141/669/original/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg',
-                };
-            })
-        );
-
-        return games;
+        const result = await GameService.GetAllGames();
+        return result;
     }
 }

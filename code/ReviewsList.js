@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
 import styles from './assets/styles.js';
 import ReviewService from './Services/ReviewsService.js';
 
 export default function ReviewsList({ navigation, route }) {
-    const { gameid } = route.params; // Récupérer le game ID depuis les paramètres de navigation
+    const { gameid } = route.params;
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    
     useEffect(() => {
-        // Charger les reviews pour ce game ID
         const fetchReviews = async () => {
             try {
                 setLoading(true);
@@ -26,25 +26,59 @@ export default function ReviewsList({ navigation, route }) {
         fetchReviews();
     }, [gameid]);
 
+
     return (
         <View style={[styles.background, { flex: 1, justifyContent: 'center', alignItems: 'center' }]}>
             {loading ? (
-                <Text>Chargement...</Text> // Afficher un indicateur pendant le chargement
+                <Text style={{ fontSize: 16, color: '#555' }}>Loading reviews...</Text>
             ) : reviews.length > 0 ? (
                 <FlatList
                     data={reviews}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
-                        <View style={{ marginBottom: 10, padding: 10, backgroundColor: '#f0f0f0', borderRadius: 10 }}>
-                            <Text style={{ fontWeight: 'bold' }}>{item.title}</Text>
-                            <Text>{item.content}</Text>
-                            <Text>Note: {item.rating}/10</Text>
+                        <View style={reviewStyles.reviewCard}>
+                            <Text style={reviewStyles.reviewTitle}>{item.title}</Text>
+                            <Text style={reviewStyles.reviewContent}>{item.content}</Text>
+                            <Text style={reviewStyles.reviewRating}>Note: {item.rating}/5</Text>
                         </View>
                     )}
                 />
             ) : (
-                <Text style={{ fontSize: 18, textAlign: 'center', color: '#555' }}>This game has no reviews.</Text>
+                <Text style={styles.tinytext}>
+                    This game has no reviews.
+                </Text>
             )}
+
+            <TouchableOpacity style={styles.ButtonMenu} onPress={() => navigation.navigate('AddReviewScreen', { gameid })}>
+                <Text style={reviewStyles.addReviewText}>Add a Review!</Text>
+            </TouchableOpacity>
         </View>
     );
 }
+
+const reviewStyles = StyleSheet.create({
+    reviewCard: {
+        marginBottom: 10,
+        padding: 15,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 10,
+        width: '90%',
+    },
+    reviewTitle: {
+        fontWeight: 'bold',
+        fontSize: 18,
+        marginBottom: 5,
+    },
+    reviewContent: {
+        fontSize: 16,
+        marginBottom: 10,
+    },
+    reviewRating: {
+        fontSize: 14,
+        color: '#888',
+    },
+    addReviewText: {
+        color: '#fff',
+        fontSize: 16,
+    },
+});
