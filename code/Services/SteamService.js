@@ -43,22 +43,22 @@ class SteamService {
 
     async GetGamesForUser(APIKEY, USERID) {
         try {
-            const response = await fetch(`https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?https://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=440&key=${APIKEY}&steamid=${USERID}&format=json`, {
-                method: 'GET', // L'API attend une requête GET
+            const response = await fetch(`https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${APIKEY}&steamid=${USERID}&format=json`, {
+                method: 'GET'
             });
 
             const data = await response.json();
 
             if (data.response.games && data.response.game_count > 0) {
                 
+                console.log(data.response.games);
                 return data.response.games;
             } else {
-                // Aucun utilisateur trouvé
-                throw new Error("Aucun jeu trouvé avec cet ID.");
+                throw new Error("Aucun jeu trouvé avec cet utilisateur.");
             }
         } catch (error) {
             console.error("Erreur lors de l'appel API:", error.message);
-            throw error; // Relance l'erreur pour la gestion dans le composant
+            throw error;
         }
     }
 
@@ -103,12 +103,10 @@ class SteamService {
     
             // Vérifie si le jeu a des données valides
             if (data[GAMEID]?.success) {
-                if (data[GAMEID].data?.header_image) {
-                    return data[GAMEID].data.header_image;  
-                } else {
-                    console.warn(`Le jeu avec l'ID ${GAMEID} n'a pas d'image.`);
-                    return null; // Skip si pas d'image
-                }
+                return {
+                    header_image: data[GAMEID].data.header_image,
+                    name: data[GAMEID].data.name,
+                };
             } else {
                 console.warn(`Aucun jeu trouvé avec l'ID ${GAMEID}.`);
                 return null; // Skip si le jeu est invalide
