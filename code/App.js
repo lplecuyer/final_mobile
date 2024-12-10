@@ -12,6 +12,7 @@ import GamesList from './GamesList.js';
 import ReviewsList from './ReviewsList.js';
 import ReviewCreate from './ReviewCreate.js';
 import ReviewUpdate from './ReviewUpdate.js';
+import UpdateComment from './UpdateComment.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -85,6 +86,12 @@ export default function App()
           <Stack.Screen
               name="ReviewUpdate"
               component={ ReviewUpdate }
+              options={{ headerShown: false }}
+          />
+
+          <Stack.Screen
+              name="UpdateComment"
+              component={ UpdateComment }
               options={{ headerShown: false }}
           />
 

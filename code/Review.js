@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList } from 'react-native';
 import CommentsService from './Services/CommentsService.js';
 import AuthService from './authentification/AuthService.js';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Review({ route }) {
     const { review } = route.params;
@@ -9,8 +10,10 @@ export default function Review({ route }) {
     const [comments, setComments] = useState([]);
     const [newText, setNewComment] = useState('');
     const [loading, setLoading] = useState(true);
+    const [editCommentId, setEditCommentId] = useState(null); // Pour suivre le commentaire en édition
 
     const loggedInUser = AuthService.currentUser;
+    const navigation = useNavigation();
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -49,32 +52,49 @@ export default function Review({ route }) {
     }, [review_id]);
 
     const addComment = async () => {
-    const newComment = {
-        user_id: loggedInUser.id,
-        review_id,
-        newText
+        const newComment = {
+            user_id: loggedInUser.id,
+            review_id,
+            newText
+        };
+
+        if (newComment.newText.trim() !== '') {
+            try {
+                const newCommentData = await CommentsService.addComment(newComment);
+
+                if (newCommentData) {
+                    const updatedComments = [...comments, { ...newCommentData }];
+                    setComments(updatedComments);
+                    setNewComment('');
+                }
+            } catch (error) {
+                console.error("Erreur lors de l'ajout du commentaire :", error);
+            }
+        } else {
+            console.warn("Le commentaire ne peut pas être vide.");
+        }
     };
 
-    if (newComment.newText.trim() !== '') {
-        try {
-            const newCommentData = await CommentsService.addComment(newComment);
+    const startEditComment = (comment) => {
+        setEditCommentId(comment.id); // Mettre à jour l'ID du commentaire en édition
+        setNewComment(comment.description); // Pré-remplir le champ avec le texte du commentaire
+    };
 
-            // Vérifier si le commentaire a bien été ajouté
-            if (newCommentData) {
-                // Ajouter simplement le commentaire sans récupérer l'auteur
-                const updatedComments = [...comments, { ...newCommentData }];
-                setComments(updatedComments); // Mise à jour de la liste des commentaires
-                setNewComment(''); // Réinitialiser le champ de texte
-            } else {
-                //console.error("Erreur : le commentaire n'a pas été ajouté correctement.");
-            }
+    const updateComment = async (commentId) => {
+        if (newText.trim() === '') return;
+
+        try {
+            await CommentsService.updateComment(commentId, { description: newText });
+            const updatedComments = comments.map(comment =>
+                comment.id === commentId ? { ...comment, description: newText } : comment
+            );
+            setComments(updatedComments);
+            setEditCommentId(null); // Quitter le mode édition
+            setNewComment('');
         } catch (error) {
-            console.error("Erreur lors de l'ajout du commentaire :", error);
+            console.error("Erreur lors de la mise à jour du commentaire :", error);
         }
-    } else {
-        console.warn("Le commentaire ne peut pas être vide.");
-    }
-};
+    };
 
     if (loading) {
         return <Text>Loading...</Text>;
@@ -96,7 +116,20 @@ export default function Review({ route }) {
                 renderItem={({ item }) => (
                     <View style={styles.commentContainer}>
                         <Text style={styles.commentAuthor}>{item.authorName || 'Auteur inconnu'} :</Text>
-                        <Text style={styles.commentText}>{item.description || 'Commentaire vide'}</Text>
+
+                            <Text style={styles.commentText}>{item.description || 'Commentaire vide'}</Text>
+
+                        {item.userId === loggedInUser.id && (
+    <TouchableOpacity
+        style={styles.ButtonMenu}
+        onPress={() => navigation.navigate('UpdateComment', {
+            commentId: item.id,
+            initialText: item.description, // Passer le texte actuel
+        })}
+    >
+        <Text style={reviewStyles.editButtonText}>Modifier</Text>
+    </TouchableOpacity>
+)}
                     </View>
                 )}
                 style={styles.commentsList}
@@ -182,17 +215,16 @@ const styles = StyleSheet.create({
     commentText: {
         color: '#d1d1d1',
     },
-    addCommentContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
     commentInput: {
         flex: 1,
         backgroundColor: '#374151',
         color: '#ffffff',
         padding: 10,
         borderRadius: 5,
-        marginRight: 10,
+    },
+    addCommentContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     addCommentButton: {
         backgroundColor: '#4CAF50',
@@ -203,5 +235,25 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontSize: 14,
         fontWeight: 'bold',
+    },
+    ButtonMenu: {
+        backgroundColor: '#4BB50D', 
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        elevation: 3, 
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 }, 
+        shadowOpacity: 0.3, 
+        shadowRadius: 2, 
+        alignItems: 'center',
+        marginVertical: 10
+    },
+});
+
+const reviewStyles = StyleSheet.create({
+    editButtonText: {
+        color: '#fff',
+        fontSize: 16,
     },
 });

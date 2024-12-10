@@ -69,6 +69,24 @@ class CommentsService {
             return null;
         }
     }
+
+    async UpdateComment(inputs) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/update-comment/execute", {
+            method: 'POST',
+            body: JSON.stringify({ inputs }),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        console.log(response)
+
+        if (response.success){
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 export default new CommentsService();
