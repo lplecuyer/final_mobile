@@ -17,7 +17,6 @@ class GamesService {
                 console.log("Jeu importé dans Users Games : ", response.name);
                 return true;
             } else {
-                console.warn("Erreur lors de l'import dans Users Games : ", response.message || response);
                 return false;
             }
         } 
@@ -41,12 +40,47 @@ class GamesService {
                 console.log("Jeu importé :", response.name);
                 return true;
             } else {
-                console.warn("Erreur lors de l'import :", response.message || response);
                 return false;
             }
         } catch (error) {
             console.error("Erreur réseau ou serveur :", error);
             return false;
+        }
+    }
+
+    async GetGameById(steam_game_id) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/select-game-by-id/execute", {
+            method: 'POST',
+            body: JSON.stringify({steam_game_id}),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        
+
+        if (response.success){
+            const game = response.data[0];
+            return game;
+        } else {
+            console.warn("something wrong happened");
+        }
+        
+    }
+    
+
+    async GetAllGames() {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/select-all-games/execute", {
+            method: 'POST',
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        if (response.success){
+            return response.data;
+        } else {
+            console.warn("something wrong happened");
         }
     }
     

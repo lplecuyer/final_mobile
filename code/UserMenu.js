@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import Toast from 'react-native-toast-message';
 import NavigationTemplate from './NavigationTemplate.js';
 import ShtweamService from './Services/SteamService.js';
 import AuthService from './authentification/AuthService.js';
@@ -51,9 +52,10 @@ export default function UserMenu() {
                 const response = await GameService.ImportGame(infos);
                 console.log(`Import de ${name} : ${response.success ? "Succès" : "Échec"}`);
             } catch (error) {
-                console.error(`Erreur lors de l'import de ${name} :`, error);
+                if (!error.message.include("SQLSTATE[23000]")) {
+                    console.error(`Erreur lors de l'import de ${name} :`, error);
+                }
             }
-            console.log("test");
             await handleImportGamesIntoUserGame(appid);
     
         });
@@ -71,7 +73,17 @@ export default function UserMenu() {
             const response = await GameService.ImportGameIntoUserGame(UserGameInfos);
             console.log(`Import du jeu dans UserGame : ${response.success ? "Succès" : "Échec"}`);
         } catch (error) {
-            console.error(`Erreur lors de l'import dans UserGame :`, error);
+            if (error.message.includes("SQLSTATE[23000]")) 
+            {
+                Toast.show({
+                    type: 'success',
+                    text1: 'succes',
+                    text2: 'your game has been imported',
+                    position: 'bottom' // 'top' | 'bottom'
+                });
+            } else {
+                console.error(`Erreur lors de l'import dans UserGame :`, error);
+            }
         }
     };
 
