@@ -1,93 +1,207 @@
-import React from 'react';
-import {StyleSheet, View, Text, TextInput, TouchableOpacity, FlatList} from 'react-native';
-import NavigationTemplate from './NavigationTemplate.js';
-const numbers = [...Array(15)]
-export default function Review() {
-  return (
-    <View style={styles.background}>
-        <View style={styles.reviewcontainer}>
-            <Text style={styles.username}>Charles</Text>
-            <Text style={styles.bigText}>Ce jeux est le pire que j'ai jamais joué</Text>
-            <Text style={styles.smallText}>reviewreviewreviewreviewreview</Text>
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList } from 'react-native';
+import CommentsService from './Services/CommentsService.js';
+import AuthService from './authentification/AuthService.js';
+
+export default function Review({ route }) {
+    const { review } = route.params;
+    const review_id = review.id;
+    const [comments, setComments] = useState([]);
+    const [newText, setNewComment] = useState('');
+    const [loading, setLoading] = useState(true);
+
+    const loggedInUser = AuthService.currentUser;
+
+    useEffect(() => {
+        const fetchComments = async () => {
+            try {
+                if (!review_id) {
+                    console.error("review_id est vide.");
+                    return;
+                }
+                setLoading(true);
+                const fetchedComments = await CommentsService.GetAllCommentsForReview(review_id);
+
+                const commentsWithAuthors = await Promise.all(
+                    fetchedComments.map(async (comment) => {
+                        try {
+                            const author = await CommentsService.GetCommentWriter(comment.userId);
+                            return { ...comment, authorName: author?.[0]?.username || 'Auteur inconnu' };
+                        } catch (error) {
+                            console.error(`Erreur en récupérant l'auteur pour commentaire ID ${comment.id}:`, error);
+                            return { ...comment, authorName: 'Auteur inconnu' };
+                        }
+                    })
+                );
+
+                setComments(commentsWithAuthors);
+            } catch (error) {
+                console.error("Erreur en récupérant les commentaires :", error);
+                setComments([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (review_id) {
+            fetchComments();
+        }
+    }, [review_id]);
+
+    const addComment = async () => {
+    const newComment = {
+        user_id: loggedInUser.id,
+        review_id,
+        newText
+    };
+
+    if (newComment.newText.trim() !== '') {
+        try {
+            const newCommentData = await CommentsService.addComment(newComment);
+
+            // Vérifier si le commentaire a bien été ajouté
+            if (newCommentData) {
+                // Ajouter simplement le commentaire sans récupérer l'auteur
+                const updatedComments = [...comments, { ...newCommentData }];
+                setComments(updatedComments); // Mise à jour de la liste des commentaires
+                setNewComment(''); // Réinitialiser le champ de texte
+            } else {
+                //console.error("Erreur : le commentaire n'a pas été ajouté correctement.");
+            }
+        } catch (error) {
+            console.error("Erreur lors de l'ajout du commentaire :", error);
+        }
+    } else {
+        console.warn("Le commentaire ne peut pas être vide.");
+    }
+};
+
+    if (loading) {
+        return <Text>Loading...</Text>;
+    }
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.reviewContainer}>
+                <Text style={styles.author}>Auteur : {review.authorName}</Text>
+                <Text style={styles.title}>{review.title}</Text>
+                <Text style={styles.description}>{review.description}</Text>
+                <Text style={styles.rating}>Note : {renderStars(review.rating)}</Text>
+            </View>
+
+            <Text style={styles.commentsHeader}>Commentaires :</Text>
+            <FlatList
+                data={comments}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <View style={styles.commentContainer}>
+                        <Text style={styles.commentAuthor}>{item.authorName || 'Auteur inconnu'} :</Text>
+                        <Text style={styles.commentText}>{item.description || 'Commentaire vide'}</Text>
+                    </View>
+                )}
+                style={styles.commentsList}
+            />
+
+            <View style={styles.addCommentContainer}>
+                <TextInput
+                    style={styles.commentInput}
+                    placeholder="Écrire un commentaire..."
+                    placeholderTextColor="#888"
+                    value={newText}
+                    onChangeText={setNewComment}
+                />
+                <TouchableOpacity style={styles.addCommentButton} onPress={addComment}>
+                    <Text style={styles.addCommentButtonText}>Ajouter</Text>
+                </TouchableOpacity>
+            </View>
         </View>
-        <FlatList
-            data={ numbers }
-            renderItem={ () => {
-                return (
-                <View style={styles.commentcontainer}>
-                    <Text style={styles.username}>Random rageux</Text>
-                    <Text style={styles.smallText}>Tu n'as pas raison, t'est une grosse merde et tu mérite de mourrir pour avoir dit ça</Text>
-                </View>
-                )
-            }}
-        />
-        <NavigationTemplate></NavigationTemplate>
-    </View>
-  );
+    );
 }
 
+function renderStars(rating) {
+    const totalStars = 5;
+    const filledStars = '★'.repeat(rating);
+    const emptyStars = '☆'.repeat(totalStars - rating);
+    return `${filledStars}${emptyStars}`;
+}
 
 const styles = StyleSheet.create({
-  background: {
-    backgroundColor: '#343C53',
-    flex: 1,
-    alignItems: 'center',
-  },
-  bigText: {
-    color: '#C5C3C0',
-    fontWeight: 'bold',
-    fontSize: 30,
-    alignContent: 'center',
-    marginTop: 25,
-  },
-  smallText: {
-    color: '#B1B1AE',
-    marginRight: 100,
-    marginTop: 20,
-    fontSize: 15,
-  },
-  username: {
-    fontSize: 20,
-    color: 'black',
-    fontWeight: 'bold',
-  },
-  reviewcontainer: {
-    backgroundColor: 'grey',
-    width: '90%',
-    marginTop: 10,
-    elevation: 40,
-  },
-  commentcontainer: {
-    backgroundColor: 'grey',
-    width: '90%',
-    marginTop: 10,
-    elevation: 40,
-  },
-  textInput: {
-    height: 40,
-    width: '50%',
-    backgroundColor: '#27516C',
-    borderColor: '#2a498c',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  buttonContainer: {
-    marginTop: 50,
-    borderRadius: 50,
-  },
-  button: {
-    backgroundColor: '#4BB50D',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#B5FA74',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+    container: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: '#2c2f48',
+    },
+    reviewContainer: {
+        backgroundColor: '#374151',
+        padding: 20,
+        borderRadius: 10,
+        marginBottom: 20,
+    },
+    author: {
+        color: '#b0bec5',
+        fontSize: 14,
+        marginBottom: 5,
+    },
+    title: {
+        color: '#ffffff',
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    description: {
+        color: '#d1d1d1',
+        fontSize: 16,
+        marginBottom: 15,
+    },
+    rating: {
+        color: '#ffaa00',
+        fontSize: 16,
+        marginBottom: 20,
+    },
+    commentsHeader: {
+        color: '#ffffff',
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    commentsList: {
+        flex: 1,
+        marginBottom: 20,
+    },
+    commentContainer: {
+        backgroundColor: '#475569',
+        padding: 10,
+        borderRadius: 5,
+        marginBottom: 10,
+    },
+    commentAuthor: {
+        color: '#b0bec5',
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    commentText: {
+        color: '#d1d1d1',
+    },
+    addCommentContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    commentInput: {
+        flex: 1,
+        backgroundColor: '#374151',
+        color: '#ffffff',
+        padding: 10,
+        borderRadius: 5,
+        marginRight: 10,
+    },
+    addCommentButton: {
+        backgroundColor: '#4CAF50',
+        padding: 10,
+        borderRadius: 5,
+    },
+    addCommentButtonText: {
+        color: '#ffffff',
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
 });

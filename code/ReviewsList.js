@@ -109,7 +109,8 @@ export default function ReviewsList({ navigation, route }) {
                     data={reviews}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
-                        <TouchableOpacity style={reviewStyles.reviewCard}>
+                        <TouchableOpacity style={reviewStyles.reviewCard} 
+                        onPress={() => navigation.navigate('Review', { review: item })}>
                             <Text style={[reviewStyles.reviewAuthor, { color: '#B1B1AE' }]}>
                                 Auteur : {item.authorName}
                             </Text>

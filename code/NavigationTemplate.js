@@ -11,7 +11,8 @@ export default function NavigationTemplate({children}) {
                 <TouchableOpacity  onPress={() => navigation.navigate('GamesList')}>
                     <Image source={require('./assets/Game_list.png')} style={styles.icon}/>
                 </TouchableOpacity>
-                <TouchableOpacity  onPress={() => navigation.navigate('Login')}>
+                  {/* onPress={() => navigation.navigate('Login')} */}
+                <TouchableOpacity>
                     <Image source={require('./assets/Discover.png')} style={styles.icon}/>
                 </TouchableOpacity>
                 <TouchableOpacity  onPress={() => navigation.navigate('User')}>
