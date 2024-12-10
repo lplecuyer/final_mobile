@@ -45,6 +45,56 @@ class ReviewsService {
             return false;
         }
     }
+
+    async GetReviewWriter(user_id) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/select-review-writer/execute", {
+            method: 'POST',
+            body: JSON.stringify({ user_id }),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        if (response.success){
+            return response.data;
+        } else {
+            return false;
+        }
+    }
+
+    async CheckIfUserOwnsGame(condition) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/check_user_owns_game/execute", {
+            method: 'POST',
+            body: JSON.stringify({ condition }),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        if (response.data && Array.isArray(response.data) && response.data.length > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    async UpdateReview(inputs) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/update-review/execute", {
+            method: 'POST',
+            body: JSON.stringify({ inputs }),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        console.log(response)
+
+        if (response.success){
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 const ReviewService = new ReviewsService();
 export default ReviewService;
