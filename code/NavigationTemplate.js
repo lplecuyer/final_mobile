@@ -3,7 +3,7 @@ import { SafeAreaView, StatusBar, View, Image, Text, TouchableOpacity } from 're
 import { useNavigation } from '@react-navigation/native';
 import styles from './assets/styles.js';
 
-export default function NavigationTemplate({ children}) {
+export default function NavigationTemplate({children}) {
     const navigation = useNavigation();
     return (
         <SafeAreaView style={{width: '100%'}}>

@@ -9,6 +9,9 @@ import BaseTemplate from './BaseTemplate.js';
 import Review from './Review.js';
 import UserToken from './UserToken.js';
 import GamesList from './GamesList.js';
+import ReviewsList from './ReviewsList.js';
+import ReviewCreate from './ReviewCreate.js';
+import ReviewUpdate from './ReviewUpdate.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,17 +40,17 @@ export default function App()
               options={{ headerShown: false }}
           />
 
-                <Stack.Screen
-                    name="User"
-                    component={ User }
-                    options={{ headerShown: false }}
-                />
+          <Stack.Screen
+              name="User"
+              component={ User }
+              options={{ headerShown: false }}
+          />
 
-                <Stack.Screen
-                    name="Review"
-                    component={ Review }
-                    options={{ headerShown: false }}
-                />
+          <Stack.Screen
+              name="Review"
+              component={ Review }
+              options={{ headerShown: false }}
+          />
                 
           <Stack.Screen
               name="SignUp"
@@ -64,6 +67,24 @@ export default function App()
           <Stack.Screen
               name="GamesList"
               component={ GamesList }
+              options={{ headerShown: false }}
+          />
+
+          <Stack.Screen
+              name="ReviewsList"
+              component={ ReviewsList }
+              options={{ headerShown: false }}
+          />
+
+          <Stack.Screen
+              name="AddReviewScreen"
+              component={ ReviewCreate }
+              options={{headerShown: false}}
+          />
+
+          <Stack.Screen
+              name="ReviewUpdate"
+              component={ ReviewUpdate }
               options={{ headerShown: false }}
           />
 

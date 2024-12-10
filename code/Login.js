@@ -9,11 +9,8 @@ export default function Login({navigation}) {
   const [password, setPassword] = useState('');
   const handleSignUp = async () => {
     const credentials = {username, password}
-        console.log(username)
-        console.log(password)
         try {
             const result = await AuthService.logIn(credentials);
-            console.log('Résultat', result);
             if (result != null) {
               navigation.navigate('GamesList');
             }
@@ -47,7 +44,6 @@ export default function Login({navigation}) {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   background: {

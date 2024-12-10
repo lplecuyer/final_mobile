@@ -1,4 +1,4 @@
-import { User } from './User.js'
+import { User } from '../Models/User.js'
 
 export class UserCredentials extends User {
 

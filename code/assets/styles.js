@@ -1,6 +1,4 @@
 import { StyleSheet } from 'react-native';
-import { SearchBar } from 'react-native-screens';
-import GamesList from '../GamesList';
 
 
 styles = StyleSheet.create({
@@ -32,12 +30,12 @@ styles = StyleSheet.create({
         textAlign: 'center',
     },
     outline: {
-    position: 'absolute',
-    fontSize: 16,
-    color: '#22262F', // Couleur de contour
-    textShadowColor: '#22262F', // Couleur d'ombre (équivalente à la bordure)
-    textShadowOffset: { width: -1, height: 1 }, // Décalage pour l'épaisseur du contour
-    textShadowRadius: 2, // Rayon de flou pour adoucir le contour
+        position: 'absolute',
+        fontSize: 16,
+        color: '#22262F', // Couleur de contour
+        textShadowColor: '#22262F', // Couleur d'ombre (équivalente à la bordure)
+        textShadowOffset: { width: -1, height: 1 }, // Décalage pour l'épaisseur du contour
+        textShadowRadius: 2, // Rayon de flou pour adoucir le contour
     },   
     title: {
         fontSize: 40,
@@ -111,8 +109,32 @@ styles = StyleSheet.create({
         width: 140,
         height: 200,
         marginTop: 20,
-        marginHorizontal: 30
+        marginHorizontal: 30,
+        resizeMode: 'stretch'
+    },
+    navigationBar: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 70, // Hauteur de la barre de navigation
+        backgroundColor: '#000', // Change selon ton design
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    textInput: {
+        height: 40,
+        width: '50%',
+        backgroundColor: '#27516C',
+        borderColor: '#2a498c',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,
     }
+    
 });
 
 export default styles
