@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import CommentsService from './Services/CommentsService';
+import CommentsService from '../Services/CommentsService';
 
 export default function UpdateComment({ route, navigation }) {
     const { commentId, initialText } = route.params; // Récupère les paramètres passés par navigation

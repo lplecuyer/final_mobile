@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {StyleSheet, View, Text, TextInput, TouchableOpacity} from 'react-native';
-import AuthService from './authentification/AuthService';
-import GamesList from './GamesList';
+import AuthService from '../authentification/AuthService';
 
 
 export default function Login({navigation}) {

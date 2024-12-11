@@ -1,18 +1,17 @@
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import MainMenu from './MainMenu.js';
-import Login from './Login.js';
-import SignUp from './SignUp.js';
-import User from './UserMenu.js';
-import BaseTemplate from './BaseTemplate.js';
-import Review from './Review.js';
-import UserToken from './UserToken.js';
-import GamesList from './GamesList.js';
-import ReviewsList from './ReviewsList.js';
-import ReviewCreate from './ReviewCreate.js';
-import ReviewUpdate from './ReviewUpdate.js';
-import UpdateComment from './UpdateComment.js';
+import MainMenu from './Views/MainMenu.js';
+import Login from './Views/Login.js';
+import SignUp from './Views/SignUp.js';
+import User from './Views/UserMenu.js';
+import BaseTemplate from './Templates/BaseTemplate.js';
+import Review from './Views/Review.js';
+import UserToken from './Views/UserToken.js';
+import GamesList from './Views/GamesList.js';
+import ReviewsList from './Views/ReviewsList.js';
+import ReviewUpdate from './Views/ReviewUpdate.js';
+import UpdateComment from './Views/UpdateComment.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -75,12 +74,6 @@ export default function App()
               name="ReviewsList"
               component={ ReviewsList }
               options={{ headerShown: false }}
-          />
-
-          <Stack.Screen
-              name="AddReviewScreen"
-              component={ ReviewCreate }
-              options={{headerShown: false}}
           />
 
           <Stack.Screen

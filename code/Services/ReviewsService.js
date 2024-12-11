@@ -95,6 +95,24 @@ class ReviewsService {
             return false;
         }
     }
+
+    async DeleteReview(ids) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/delete-review/execute", {
+            method: 'POST',
+            body: JSON.stringify({ ids }),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        console.log(response)
+
+        if (response.success){
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 const ReviewService = new ReviewsService();
 export default ReviewService;

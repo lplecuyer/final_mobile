@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity, ScrollView } from 'react-native';
-import AuthService from'./authentification/AuthService.js'
+import AuthService from'../authentification/AuthService.js'
 
 
 

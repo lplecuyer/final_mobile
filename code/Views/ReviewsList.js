@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Rating } from '@kolking/react-native-rating';
-import styles from './assets/styles.js';
-import ReviewService from './Services/ReviewsService.js';
-import GameService from './Services/GamesService.js';
-import AuthService from './authentification/AuthService.js';
+import styles from '../assets/styles.js';
+import ReviewService from '../Services/ReviewsService.js';
+import GameService from '../Services/GamesService.js';
+import AuthService from '../authentification/AuthService.js';
 
 export default function ReviewsList({ navigation, route }) {
     const loggedInUser = AuthService.currentUser;
@@ -52,43 +53,83 @@ export default function ReviewsList({ navigation, route }) {
     }, [game_id]);
 
     // Fonction pour récupérer les reviews et leurs auteurs
-    useEffect(() => {
-        const fetchReviews = async () => {
-            try {
-                if (!game_id) {
-                    console.error("game_id est vide.");
-                    return;
+    useFocusEffect(
+        useCallback(() => {
+            const fetchReviews = async () => {
+                try {
+                    if (!game_id) {
+                        console.error("game_id est vide.");
+                        return;
+                    }
+                    setLoading(true);
+                    const fetchedReviews = await ReviewService.GetAllReviewsForGame(game_id);
+
+                    // Charger les noms des auteurs pour chaque review
+                    const reviewsWithAuthors = await Promise.all(
+                        fetchedReviews.map(async (review) => {
+                            try {
+                                const author = await ReviewService.GetReviewWriter(review.user_id);
+                                const authordata = author[0];
+                                return { ...review, authorName: authordata.username };
+                            } catch (error) {
+                                console.error(`Erreur en récupérant l'auteur pour review ID ${review.id} :`, error);
+                                return { ...review, authorName: 'Utilisateur inconnu' };
+                            }
+                        })
+                    );
+
+                    setReviews(reviewsWithAuthors);
+                } catch (error) {
+                    console.error("Erreur en récupérant les reviews :", error);
+                    setReviews([]);
+                } finally {
+                    setLoading(false);
                 }
-                setLoading(true);
-                const fetchedReviews = await ReviewService.GetAllReviewsForGame(game_id);
+            };
 
-                // Charger les noms des auteurs pour chaque review
-                const reviewsWithAuthors = await Promise.all(
-                    fetchedReviews.map(async (review) => {
-                        try {
-                            const author = await ReviewService.GetReviewWriter(review.user_id);
-                            const authordata = author[0];
-                            return { ...review, authorName: authordata.username };
-                        } catch (error) {
-                            console.error(`Erreur en récupérant l'auteur pour review ID ${review.id} :`, error);
-                            return { ...review, authorName: 'Utilisateur inconnu' };
-                        }
-                    })
-                );
-
-                setReviews(reviewsWithAuthors);
-            } catch (error) {
-                console.error("Erreur en récupérant les reviews :", error);
-                setReviews([]);
-            } finally {
-                setLoading(false);
+            if (game_id) {
+                fetchReviews();
             }
-        };
 
-        if (game_id) {
-            fetchReviews();
-        }
-    }, [game_id]);
+            // Nettoyage optionnel si nécessaire
+            return () => {
+                setReviews([]); // Réinitialiser les reviews si besoin
+                setLoading(false);
+            };
+        }, [game_id])
+    );
+
+    const HandleDelete = (reviewId) => {
+        Alert.alert(
+            "Confirmation de suppression",
+            "Êtes-vous sûr de vouloir supprimer cette Review ? Tous les commentaires associés seront également supprimés.",
+            [
+                {
+                    text: "Annuler",
+                    style: "cancel",
+                },
+                {
+                    text: "Supprimer",
+                    onPress: async () => {
+                        try {
+                            const userid = loggedInUser.id;
+                            const ids = { userid, reviewId };
+
+                            await ReviewService.DeleteReview(ids);
+                            setReviews((prevReviews) =>
+                                prevReviews.filter((review) => review.id !== reviewId)
+                            );
+                            console.log("Review supprimée avec succès.");
+                        } catch (error) {
+                            console.error("Erreur lors de la suppression de la review :", error);
+                        }
+                    },
+                    style: "destructive", // Optionnel, pour afficher en rouge sur iOS
+                },
+            ]
+        );
+    };
+
 
     return (
         <View style={[styles.background, { flex: 1, justifyContent: 'center', alignItems: 'center' }]}>
@@ -109,8 +150,8 @@ export default function ReviewsList({ navigation, route }) {
                     data={reviews}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
-                        <TouchableOpacity style={reviewStyles.reviewCard} 
-                        onPress={() => navigation.navigate('Review', { review: item })}>
+                        <TouchableOpacity style={reviewStyles.reviewCard}
+                            onPress={() => navigation.navigate('Review', { review: item })}>
                             <Text style={[reviewStyles.reviewAuthor, { color: '#B1B1AE' }]}>
                                 Auteur : {item.authorName}
                             </Text>
@@ -120,15 +161,23 @@ export default function ReviewsList({ navigation, route }) {
                                 Note : <Rating disabled={true} size={15} baseColor='black' fillColor='white' rating={item.rating} />
                             </Text>
 
-                            
-                            {item.user_id === loggedInUser.id && (
+
+                            {item.user_id === loggedInUser.id && [(
                                 <TouchableOpacity
                                     style={styles.ButtonMenu}
                                     onPress={() => navigation.navigate('ReviewUpdate', { item, game_id })}
                                 >
                                     <Text style={reviewStyles.editButtonText}>Modifier</Text>
                                 </TouchableOpacity>
-                            )}
+                            ), (
+                                <TouchableOpacity
+                                    style={[styles.ButtonMenu, { backgroundColor: "#8b0609" }]}
+                                    onPress={() => HandleDelete(item.id)}
+                                >
+                                    <Text style={reviewStyles.editButtonText}>Supprimer</Text>
+                                </TouchableOpacity>
+
+                            )]};
                         </TouchableOpacity>
                     )}
                 />
@@ -138,7 +187,7 @@ export default function ReviewsList({ navigation, route }) {
                 </Text>
             )}
 
-            <TouchableOpacity style={styles.ButtonMenu} onPress={() => navigation.navigate('AddReviewScreen', { gameid })}>
+            <TouchableOpacity style={styles.ButtonMenu} onPress={() => navigation.navigate('ReviewUpdate', { game_id })}>
                 <Text style={reviewStyles.addReviewText}>Ajouter une Review !</Text>
             </TouchableOpacity>
         </View>

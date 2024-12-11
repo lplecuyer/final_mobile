@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import Toast from 'react-native-toast-message';
-import NavigationTemplate from './NavigationTemplate.js';
-import ShtweamService from './Services/SteamService.js';
-import AuthService from './authentification/AuthService.js';
-import GameService from './Services/GamesService.js';
+import NavigationTemplate from '../Templates/NavigationTemplate.js';
+import ShtweamService from '../Services/SteamService.js';
+import AuthService from '../authentification/AuthService.js';
+import GameService from '../Services/GamesService.js';
 
 export default function UserMenu() {
     const [games, setGames] = useState([]);
@@ -28,7 +28,7 @@ export default function UserMenu() {
                             : { appid: game.appid, name: 'Jeu inconnu', header_image: null };
                     })
                 );
-
+                
                 setGames(gamesWithDetails);
             } catch (error) {
                 console.error("Erreur en récupérant les jeux :", error);
@@ -62,6 +62,7 @@ export default function UserMenu() {
     
         // Attendre que tous les imports soient terminés
         await Promise.all(importPromises);
+        alert("jeux importer avec succes!");
     };
 
     const handleImportGamesIntoUserGame = async (appid) => {
@@ -92,7 +93,7 @@ export default function UserMenu() {
             <View style={styles.menucontainer}>
                 <View style={styles.userContainer}>
                     <View style={styles.logoContainer}>
-                        <Image source={require('./assets/User_Icon.png')} style={styles.logo} />
+                        <Image source={require('../assets/User_Icon.png')} style={styles.logo} />
                     </View>
                     <Text style={styles.smallText}>{loggedInUser.username}</Text>
                     <Text style={styles.smallText}>Level</Text>
@@ -106,7 +107,7 @@ export default function UserMenu() {
                             numColumns={2}
                             data={[...Array(10)]}
                             renderItem={() => (
-                                <Image source={require('./assets/User_Icon.png')} style={styles.review} />
+                                <Image source={require('../assets/User_Icon.png')} style={styles.review} />
                             )}
                         />
                     </View>
@@ -127,7 +128,7 @@ export default function UserMenu() {
                             {item.header_image ? (
                                 <Image source={{ uri: item.header_image }} style={styles.gameIcon} />
                             ) : (
-                                <Image source={require('./assets/User_Icon.png')} style={styles.gameIcon} />
+                                <Image source={require('../assets/User_Icon.png')} style={styles.gameIcon} />
                             )}
                             <Text style={styles.smallText}>{item.name}</Text>
                         </View>

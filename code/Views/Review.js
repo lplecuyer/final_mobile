@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList } from 'react-native';
-import CommentsService from './Services/CommentsService.js';
-import AuthService from './authentification/AuthService.js';
+import CommentsService from '../Services/CommentsService.js';
+import AuthService from '../authentification/AuthService.js';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Review({ route }) {

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import styles from './assets/styles.js';
-import NavigationTemplate from './NavigationTemplate.js';
-import ShtweamService from './Services/SteamService.js';
-import GameService from './Services/GamesService.js';
+import styles from '../assets/styles.js';
+import NavigationTemplate from '../Templates/NavigationTemplate.js';
+import ShtweamService from '../Services/SteamService.js';
+import GameService from '../Services/GamesService.js';
 
 export default function GamesList({ navigation }) {
     const [selectedFilter, setSelectedFilter] = useState("OrderAZ");
