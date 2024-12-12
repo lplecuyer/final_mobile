@@ -3,22 +3,23 @@ import { Review } from '../Models/Review.js'
 class ReviewsService {
 
     #reviewsList = [];
-    async GetAllReviewsForGame(game_id) {
+    async GetAllReviewsForGame( ids ) {
         try {
             const response = await fetch("http://martha.jh.shawinigan.info/queries/select-all-reviews-for-game/execute", {
                 method: 'POST',
-                body: JSON.stringify({ game_id }),
+                body: JSON.stringify({ ids }),
                 headers: {
                     'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
                 }
             }).then((r) => r.json());
 
+            //console.log(response.data);
             if (response.success) {
                 this.#reviewsList = [];
                 const reviews = response.data;
                 reviews.forEach((reviewData) => {
-                    const review = new Review(reviewData)
-                    this.#reviewsList.push(review)
+                    const review = new Review(reviewData);
+                    this.#reviewsList.push(review);
                 });
             } else {
                 this.#reviewsList = [];
@@ -62,8 +63,8 @@ class ReviewsService {
         }
     }
 
-    async CheckIfUserOwnsGame(condition) {
-        const response = await fetch("http://martha.jh.shawinigan.info/queries/check_user_owns_game/execute", {
+    async CheckIfUserOwnsGameAndReviewed(condition) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/check_user_owns_game_and_reviewed/execute", {
             method: 'POST',
             body: JSON.stringify({ condition }),
             headers: {
@@ -72,7 +73,7 @@ class ReviewsService {
         }).then((r) => r.json());
 
         if (response.data && Array.isArray(response.data) && response.data.length > 0){
-            return true;
+            return response.data;
         } else {
             return false;
         }

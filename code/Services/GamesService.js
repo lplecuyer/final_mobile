@@ -84,6 +84,37 @@ class GamesService {
         }
     }
     
+    async RemoveGameFromUser(ids) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/delete-game/execute", {
+            method: 'POST',
+            body: JSON.stringify({ids}),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        if (response.success) {
+            return response;
+        } else {
+            return false;
+        }
+    }
+
+    async UserHasGame(ids) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/user-owns-game/execute", {
+            method: 'POST',
+            body: JSON.stringify({ids}),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        if (response.success) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 const GameService = new GamesService();
 export default GameService;

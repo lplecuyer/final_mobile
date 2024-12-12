@@ -9,27 +9,45 @@ import GameService from '../Services/GamesService.js';
 export default function UserMenu() {
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const [userGames, setUserGames] = useState([]); 
     const loggedInUser = AuthService.currentUser;
+
+    const [importedGames, setImportedGames] = useState({}); 
+
+    useEffect(() => {
+        const checkImportedGames = async () => {
+            const importedGamesData = {};
+            for (const game of games) {
+                const isImported = await isGameImported(game.appid);
+                importedGamesData[game.appid] = isImported; 
+            }
+            setImportedGames(importedGamesData); 
+        };
+
+        if (games.length > 0) {
+            checkImportedGames(); 
+        }
+    }, [games]);
 
     useEffect(() => {
         const fetchGames = async () => {
             try {
                 setLoading(true);
                 console.log(loggedInUser);
-                const userGames = await ShtweamService.GetGamesForUser(loggedInUser.token, loggedInUser.steam_id);
+                const userGamesData = await ShtweamService.GetGamesForUser(loggedInUser.token, loggedInUser.steam_id);
 
                 // Charge les détails de chaque jeu
                 const gamesWithDetails = await Promise.all(
-                    userGames.map(async (game) => {
+                    userGamesData.map(async (game) => {
                         const details = await ShtweamService.GetGameInfo(game.appid);
                         return details
                             ? { appid: game.appid, ...details }
                             : { appid: game.appid, name: 'Jeu inconnu', header_image: null };
                     })
                 );
-                
+
                 setGames(gamesWithDetails);
+                setUserGames(userGamesData);
             } catch (error) {
                 console.error("Erreur en récupérant les jeux :", error);
                 setGames([]);
@@ -39,54 +57,82 @@ export default function UserMenu() {
         };
 
         fetchGames();
-    }, []);
+    }, []); // This only runs once when the component mounts
 
     const handleImportGames = async () => {
-    
         const importPromises = games.map(async (game) => {
-    
             const { name, header_image, appid } = game;
             const infos = { name, header_image, appid };
-    
+
             try {
                 const response = await GameService.ImportGame(infos);
                 console.log(`Import de ${name} : ${response.success ? "Succès" : "Échec"}`);
-            } catch (error) {
-                if (!error.message.include("SQLSTATE[23000]")) {
-                    console.error(`Erreur lors de l'import de ${name} :`, error);
+                if (response.success) {
+                    await handleImportGamesIntoUserGame(appid);
                 }
+            } catch (error) {
+                console.error(`Erreur lors de l'import de ${name} :`, error);
             }
-            await handleImportGamesIntoUserGame(appid);
-    
         });
-    
-        // Attendre que tous les imports soient terminés
         await Promise.all(importPromises);
-        alert("jeux importer avec succes!");
+
+        alert("Jeux importés avec succès!");
+    };
+
+    const handleUnimportGame = async (appid) => {
+        try {
+            const user_id = loggedInUser.id;
+            const ids = { user_id, appid };
+            const response = await GameService.RemoveGameFromUser(ids);
+            if (response.success) {
+                Toast.show({
+                    type: 'success',
+                    text1: 'Succès',
+                    text2: 'Jeu désimporté avec succès',
+                    position: 'bottom',
+                });
+                setUserGames(userGames.filter((game) => game.appid !== appid)); // Remove the game from userGames
+            } else {
+                console.error("Erreur lors de la suppression du jeu");
+            }
+        } catch (error) {
+            console.error("Erreur lors de la suppression du jeu :", error);
+        }
     };
 
     const handleImportGamesIntoUserGame = async (appid) => {
-    
         const userid = loggedInUser.id;
         const UserGameInfos = { userid, appid };
-    
+
         try {
             const response = await GameService.ImportGameIntoUserGame(UserGameInfos);
             console.log(`Import du jeu dans UserGame : ${response.success ? "Succès" : "Échec"}`);
         } catch (error) {
-            if (error.message.includes("SQLSTATE[23000]")) 
-            {
+            if (error.message.includes("SQLSTATE[23000]")) {
                 Toast.show({
                     type: 'success',
-                    text1: 'succes',
-                    text2: 'your game has been imported',
-                    position: 'bottom' // 'top' | 'bottom'
+                    text1: 'Succès',
+                    text2: 'Votre jeu a été importé',
+                    position: 'bottom',
                 });
             } else {
                 console.error(`Erreur lors de l'import dans UserGame :`, error);
             }
         }
     };
+
+    const isGameImported = async (appid) => {
+        try {
+            const user_id = loggedInUser.id;
+            const ids = { user_id, appid }
+            const result = await GameService.UserHasGame(ids);
+            return result;
+        } catch (error) {
+            console.error("Erreur lors de la vérification du jeu importé :", error);
+            return false;
+        }
+    };
+
 
     return (
         <View style={styles.background}>
@@ -131,6 +177,16 @@ export default function UserMenu() {
                                 <Image source={require('../assets/User_Icon.png')} style={styles.gameIcon} />
                             )}
                             <Text style={styles.smallText}>{item.name}</Text>
+
+                            {importedGames[item.appid] && (
+                                <TouchableOpacity
+                                    style={styles.unimportButton}
+                                    onPress={() => handleUnimportGame(item.appid)}
+                                >
+                                    <Text style={styles.unimportButtonText}>Unimport</Text>
+                                </TouchableOpacity>
+                            )}
+
                         </View>
                     )}
                 />
@@ -223,6 +279,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         flexDirection: 'row',
         marginBottom: 10,
+        alignItems: 'center',
     },
     gameIcon: {
         marginLeft: 10,
@@ -232,5 +289,16 @@ const styles = StyleSheet.create({
     },
     gameList: {
         width: '90%',
+    },
+    unimportButton: {
+        backgroundColor: '#FF4C4C',
+        padding: 5,
+        borderRadius: 5,
+        marginLeft: 'auto',
+        marginRight: 10,
+    },
+    unimportButtonText: {
+        color: '#fff',
+        fontSize: 14,
     },
 });

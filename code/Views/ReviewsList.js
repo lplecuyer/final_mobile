@@ -15,6 +15,8 @@ export default function ReviewsList({ navigation, route }) {
     const [gameName, setGameName] = useState('');
     const [game_id, setGameId] = useState('');
     const [userOwnsGame, setUserOwnsGame] = useState(false);
+    const [hasUserReviewed, setHasUserReviewed] = useState(false);
+
 
     // Fonction pour récupérer le nom du jeu
     useEffect(() => {
@@ -33,24 +35,34 @@ export default function ReviewsList({ navigation, route }) {
         fetchGameName();
     }, [gameid]);
 
-    // Fonction pour vérifier si l'utilisateur possède le jeu
-    useEffect(() => {
-        const checkUserOwnership = async () => {
-            try {
-                if (!game_id) return;
-                const user_id = loggedInUser.id;
-                const condition = { game_id, user_id };
-                const ownsGame = await ReviewService.CheckIfUserOwnsGame(condition);
-                setUserOwnsGame(ownsGame);
-            } catch (error) {
-                console.error("Erreur lors de la vérification de la possession du jeu :", error);
+    useFocusEffect(
+        useCallback(() => {
+            const checkUserOwnership = async () => {
+                try {
+                    if (!game_id) return;
+                    const user_id = loggedInUser.id;
+                    const condition = { game_id, user_id };
+                    const ownsGame = await ReviewService.CheckIfUserOwnsGameAndReviewed(condition);
+    
+                    setUserOwnsGame(ownsGame[0].owns_game);
+                    setHasUserReviewed(ownsGame[0].has_reviewed);
+                } catch (error) {
+                    console.error("Erreur lors de la vérification de la possession du jeu :", error);
+                }
+            };
+    
+            // Vérifiez la possession du jeu lorsque l'écran est actif
+            if (game_id) {
+                checkUserOwnership();
             }
-        };
-
-        if (game_id) {
-            checkUserOwnership();
-        }
-    }, [game_id]);
+    
+            // Optionnel : Réinitialiser les valeurs lors du départ de l'écran si nécessaire
+            return () => {
+                setUserOwnsGame(false);
+                setHasUserReviewed(false);
+            };
+        }, [game_id, loggedInUser.id]) // Dépendances
+    );
 
     // Fonction pour récupérer les reviews et leurs auteurs
     useFocusEffect(
@@ -62,23 +74,12 @@ export default function ReviewsList({ navigation, route }) {
                         return;
                     }
                     setLoading(true);
-                    const fetchedReviews = await ReviewService.GetAllReviewsForGame(game_id);
 
-                    // Charger les noms des auteurs pour chaque review
-                    const reviewsWithAuthors = await Promise.all(
-                        fetchedReviews.map(async (review) => {
-                            try {
-                                const author = await ReviewService.GetReviewWriter(review.user_id);
-                                const authordata = author[0];
-                                return { ...review, authorName: authordata.username };
-                            } catch (error) {
-                                console.error(`Erreur en récupérant l'auteur pour review ID ${review.id} :`, error);
-                                return { ...review, authorName: 'Utilisateur inconnu' };
-                            }
-                        })
-                    );
+                    const user_id = loggedInUser.id;
+                    const ids = {game_id, user_id};
 
-                    setReviews(reviewsWithAuthors);
+                    const fetchedReviews = await ReviewService.GetAllReviewsForGame(ids);
+                    setReviews(fetchedReviews);
                 } catch (error) {
                     console.error("Erreur en récupérant les reviews :", error);
                     setReviews([]);
@@ -91,13 +92,14 @@ export default function ReviewsList({ navigation, route }) {
                 fetchReviews();
             }
 
-            // Nettoyage optionnel si nécessaire
             return () => {
                 setReviews([]); // Réinitialiser les reviews si besoin
                 setLoading(false);
             };
         }, [game_id])
     );
+
+    
 
     const HandleDelete = (reviewId) => {
         Alert.alert(
@@ -120,6 +122,7 @@ export default function ReviewsList({ navigation, route }) {
                                 prevReviews.filter((review) => review.id !== reviewId)
                             );
                             console.log("Review supprimée avec succès.");
+                            setHasUserReviewed(false);
                         } catch (error) {
                             console.error("Erreur lors de la suppression de la review :", error);
                         }
@@ -162,22 +165,24 @@ export default function ReviewsList({ navigation, route }) {
                             </Text>
 
 
-                            {item.user_id === loggedInUser.id && [(
-                                <TouchableOpacity
-                                    style={styles.ButtonMenu}
-                                    onPress={() => navigation.navigate('ReviewUpdate', { item, game_id })}
-                                >
-                                    <Text style={reviewStyles.editButtonText}>Modifier</Text>
-                                </TouchableOpacity>
-                            ), (
-                                <TouchableOpacity
-                                    style={[styles.ButtonMenu, { backgroundColor: "#8b0609" }]}
-                                    onPress={() => HandleDelete(item.id)}
-                                >
-                                    <Text style={reviewStyles.editButtonText}>Supprimer</Text>
-                                </TouchableOpacity>
+                            {item.user_id === loggedInUser.id && (
+                                <>
+                                    <TouchableOpacity
+                                        style={styles.ButtonMenu}
+                                        onPress={() => navigation.navigate('ReviewUpdate', { item, game_id })}
+                                    >
+                                        <Text style={reviewStyles.editButtonText}>Modifier</Text>
+                                    </TouchableOpacity>
 
-                            )]};
+                                    <TouchableOpacity
+                                        style={[styles.ButtonMenu, { backgroundColor: "#8b0609" }]}
+                                        onPress={() => HandleDelete(item.id)}
+                                    >
+                                        <Text style={reviewStyles.editButtonText}>Supprimer</Text>
+                                    </TouchableOpacity>
+                                </>
+                            )}
+
                         </TouchableOpacity>
                     )}
                 />
@@ -187,9 +192,18 @@ export default function ReviewsList({ navigation, route }) {
                 </Text>
             )}
 
-            <TouchableOpacity style={styles.ButtonMenu} onPress={() => navigation.navigate('ReviewUpdate', { game_id })}>
-                <Text style={reviewStyles.addReviewText}>Ajouter une Review !</Text>
-            </TouchableOpacity>
+            {userOwnsGame && !hasUserReviewed && (
+                <TouchableOpacity style={styles.ButtonMenu} onPress={() => navigation.navigate('ReviewUpdate', { game_id })}>
+                    <Text style={reviewStyles.addReviewText}>Ajouter une Review !</Text>
+                </TouchableOpacity>
+            )}
+
+            {hasUserReviewed && (
+                <Text style={{ fontSize: 16, color: '#888', marginBottom: 10 }}>
+                    Merci pour votre Review!
+                </Text>
+            )}
+
         </View>
     );
 }
