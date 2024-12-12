@@ -5,29 +5,57 @@ import NavigationTemplate from '../Templates/NavigationTemplate.js';
 import ShtweamService from '../Services/SteamService.js';
 import AuthService from '../authentification/AuthService.js';
 import GameService from '../Services/GamesService.js';
+import ReviewService from '../Services/ReviewsService.js';
 
-export default function UserMenu() {
+export default function UserMenu({navigation}) {
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [userGames, setUserGames] = useState([]); 
+    const [userGames, setUserGames] = useState([]);
+    const [userImage, setUserImage] = useState(null);
+    const [reviews, setReviews] = useState([]);
     const loggedInUser = AuthService.currentUser;
 
-    const [importedGames, setImportedGames] = useState({}); 
+    const [importedGames, setImportedGames] = useState({});
 
     useEffect(() => {
         const checkImportedGames = async () => {
             const importedGamesData = {};
             for (const game of games) {
                 const isImported = await isGameImported(game.appid);
-                importedGamesData[game.appid] = isImported; 
+                importedGamesData[game.appid] = isImported;
             }
-            setImportedGames(importedGamesData); 
+            setImportedGames(importedGamesData);
         };
 
         if (games.length > 0) {
-            checkImportedGames(); 
+            checkImportedGames();
         }
     }, [games]);
+
+    useEffect(() => {
+        const fetchUserReviews = async () => {
+            try {
+                const user_id = loggedInUser.id;
+                const userReviews = await ReviewService.GetReviewsForUser(user_id);
+
+                const reviewsWithGameNames = await Promise.all(userReviews.map(async (review) => {
+                    const id = review.game_id
+                    const gameDetails = await GameService.GetGame(id);  
+                    return {
+                        ...review,
+                        game_name: gameDetails ? gameDetails.name : 'Jeu inconnu',  
+                    };
+                }));
+
+                setReviews(reviewsWithGameNames);
+            } catch (error) {
+                console.error("Erreur en récupérant les reviews de l'utilisateur :", error);
+            }
+        };
+
+
+        fetchUserReviews();
+    }, [loggedInUser]);
 
     useEffect(() => {
         const fetchGames = async () => {
@@ -36,7 +64,6 @@ export default function UserMenu() {
                 console.log(loggedInUser);
                 const userGamesData = await ShtweamService.GetGamesForUser(loggedInUser.token, loggedInUser.steam_id);
 
-                // Charge les détails de chaque jeu
                 const gamesWithDetails = await Promise.all(
                     userGamesData.map(async (game) => {
                         const details = await ShtweamService.GetGameInfo(game.appid);
@@ -57,26 +84,44 @@ export default function UserMenu() {
         };
 
         fetchGames();
-    }, []); // This only runs once when the component mounts
+    }, []);
 
     const handleImportGames = async () => {
         const importPromises = games.map(async (game) => {
             const { name, header_image, appid } = game;
-            const infos = { name, header_image, appid };
+            const user_id = loggedInUser.id;
 
-            try {
-                const response = await GameService.ImportGame(infos);
-                console.log(`Import de ${name} : ${response.success ? "Succès" : "Échec"}`);
-                if (response.success) {
-                    await handleImportGamesIntoUserGame(appid);
+
+            const isImported = importedGames[appid];
+
+            if (!isImported) {
+                const infos = { name, header_image, appid, user_id };
+                try {
+                    const response = await GameService.ImportGame(infos);
+                    setImportedGames((prev) => ({
+                        ...prev,
+                        [appid]: true,
+                    }));
+
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Succès',
+                        text2: `${name} importé avec succès!`,
+                        position: 'top',
+                    });
+                } catch (error) {
+                    console.error(`Erreur lors de l'import de ${name} :`, error);
                 }
-            } catch (error) {
-                console.error(`Erreur lors de l'import de ${name} :`, error);
+            } else {
+                Toast.show({
+                    type: 'info',
+                    text1: 'Déjà importé',
+                    text2: `${name} est déjà dans votre collection.`,
+                    position: 'top',
+                });
             }
         });
         await Promise.all(importPromises);
-
-        alert("Jeux importés avec succès!");
     };
 
     const handleUnimportGame = async (appid) => {
@@ -89,9 +134,13 @@ export default function UserMenu() {
                     type: 'success',
                     text1: 'Succès',
                     text2: 'Jeu désimporté avec succès',
-                    position: 'bottom',
+                    position: 'top',
                 });
-                setUserGames(userGames.filter((game) => game.appid !== appid)); // Remove the game from userGames
+                setImportedGames((prevImportedGames) => ({
+                    ...prevImportedGames,
+                    [appid]: false,
+                }));
+
             } else {
                 console.error("Erreur lors de la suppression du jeu");
             }
@@ -100,26 +149,20 @@ export default function UserMenu() {
         }
     };
 
-    const handleImportGamesIntoUserGame = async (appid) => {
-        const userid = loggedInUser.id;
-        const UserGameInfos = { userid, appid };
-
-        try {
-            const response = await GameService.ImportGameIntoUserGame(UserGameInfos);
-            console.log(`Import du jeu dans UserGame : ${response.success ? "Succès" : "Échec"}`);
-        } catch (error) {
-            if (error.message.includes("SQLSTATE[23000]")) {
-                Toast.show({
-                    type: 'success',
-                    text1: 'Succès',
-                    text2: 'Votre jeu a été importé',
-                    position: 'bottom',
-                });
-            } else {
-                console.error(`Erreur lors de l'import dans UserGame :`, error);
+    useEffect(() => {
+        const fetchUserImage = async () => {
+            try {
+                const userInfo = await ShtweamService.GetUser(loggedInUser.token, loggedInUser.steam_id);
+                if (userInfo && userInfo.avatar) {
+                    setUserImage(userInfo.avatar);
+                }
+            } catch (error) {
+                console.error("Erreur en récupérant l'image de l'utilisateur :", error);
             }
-        }
-    };
+        };
+
+        fetchUserImage();
+    }, [loggedInUser]);
 
     const isGameImported = async (appid) => {
         try {
@@ -137,24 +180,33 @@ export default function UserMenu() {
     return (
         <View style={styles.background}>
             <View style={styles.menucontainer}>
-                <View style={styles.userContainer}>
+                <View style={[styles.userContainer, { marginLeft: 20 }]}>
                     <View style={styles.logoContainer}>
-                        <Image source={require('../assets/User_Icon.png')} style={styles.logo} />
+                        <Image
+                            source={userImage ? { uri: userImage } : require('../assets/User_Icon.png')}
+                            style={styles.logo}
+                        />
                     </View>
-                    <Text style={styles.smallText}>{loggedInUser.username}</Text>
-                    <Text style={styles.smallText}>Level</Text>
-                    <Text style={styles.smallText}>Achievement : 42</Text>
+                    <View style={{marginLeft: 15}}>
+                        <Text style={[styles.title, { marginTop: 30 }]}>{loggedInUser.username}</Text>
+                        <Text style={styles.smallText}>Level</Text>
+                        <Text style={styles.smallText}>Achievement : 42</Text>
+                    </View>
                 </View>
 
                 <View style={styles.reviewContainerContainer}>
                     <Text style={[styles.smallText, { marginLeft: 0 }]}>Reviews</Text>
                     <View style={styles.reviewContainer}>
                         <FlatList
-                            numColumns={2}
-                            data={[...Array(10)]}
-                            renderItem={() => (
-                                <Image source={require('../assets/User_Icon.png')} style={styles.review} />
+                            data={reviews}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity style={styles.review} onPress={() => navigation.navigate('Review', { review: item })}>
+                                    <Text style={styles.title}>{item.title}</Text>
+                                    <Text style={styles.smallText}>{item.game_name}</Text>
+                                    <Text style={styles.smallText}>{item.description}</Text>
+                                </TouchableOpacity>
                             )}
+                            keyExtractor={(item) => item.id.toString()}
                         />
                     </View>
                 </View>
@@ -300,5 +352,39 @@ const styles = StyleSheet.create({
     unimportButtonText: {
         color: '#fff',
         fontSize: 14,
+    },
+    reviewContainer: {
+        width: '100%',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        marginBottom: 15,
+    },
+
+    reviewTouchable: {
+        backgroundColor: '#2C2F3B',
+        borderRadius: 8,
+        padding: 15,
+        marginBottom: 10,
+        elevation: 4, 
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+    },
+    review: {
+        width: '90%',
+        padding: 10,
+        backgroundColor: '#444',
+        borderRadius: 10,
+        marginBottom: 10,
+        marginLeft: 15,
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+    smallText: {
+        color: '#B1B1AE',
+        marginTop: 5,
+        fontSize: 16,
     },
 });

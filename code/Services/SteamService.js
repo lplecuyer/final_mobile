@@ -23,21 +23,19 @@ class SteamService {
     async GetAllSteamGames(APIKEY) {
         try {
             const response = await fetch(`https://api.steampowered.com/IStoreService/GetAppList/v1/?key=${APIKEY}&max_results=1000`, {
-                method: 'GET', // L'API attend une requête GET
+                method: 'GET', 
             });
 
             const data = await response.json();
 
             if (data.response && data.response.apps.length > 0) {
-                // Parcourt le tableau et récupère les noms des applications
                 return data.response.apps
             } else {
-                // Aucun utilisateur trouvé
                 throw new Error("Aucun utilisateur trouvé avec cet ID.");
             }
         } catch (error) {
             console.error("Erreur lors de l'appel API1:", error.message);
-            throw error; // Relance l'erreur pour la gestion dans le composant
+            throw error; 
         }
     }
 
@@ -50,8 +48,6 @@ class SteamService {
             const data = await response.json();
 
             if (data.response.games && data.response.game_count > 0) {
-                
-                console.log(data.response.games);
                 return data.response.games;
             } else {
                 throw new Error("Aucun jeu trouvé avec cet utilisateur.");

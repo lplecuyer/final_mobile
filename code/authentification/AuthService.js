@@ -16,7 +16,6 @@ class AuthService {
         if (response.success && response.data.length == 1)  {
             const user = response.data[0];
             this.currentUser = new User( user.id, user.username, user.pwd, user.token, user.steam_id );
-            console.log(this.currentUser);
         } else {
             this.currentUser = null;
         }

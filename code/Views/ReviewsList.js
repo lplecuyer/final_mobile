@@ -51,20 +51,17 @@ export default function ReviewsList({ navigation, route }) {
                 }
             };
     
-            // Vérifiez la possession du jeu lorsque l'écran est actif
             if (game_id) {
                 checkUserOwnership();
             }
     
-            // Optionnel : Réinitialiser les valeurs lors du départ de l'écran si nécessaire
             return () => {
                 setUserOwnsGame(false);
                 setHasUserReviewed(false);
             };
-        }, [game_id, loggedInUser.id]) // Dépendances
+        }, [game_id, loggedInUser.id]) 
     );
 
-    // Fonction pour récupérer les reviews et leurs auteurs
     useFocusEffect(
         useCallback(() => {
             const fetchReviews = async () => {
@@ -93,7 +90,7 @@ export default function ReviewsList({ navigation, route }) {
             }
 
             return () => {
-                setReviews([]); // Réinitialiser les reviews si besoin
+                setReviews([]); 
                 setLoading(false);
             };
         }, [game_id])
@@ -127,7 +124,7 @@ export default function ReviewsList({ navigation, route }) {
                             console.error("Erreur lors de la suppression de la review :", error);
                         }
                     },
-                    style: "destructive", // Optionnel, pour afficher en rouge sur iOS
+                    style: "destructive",
                 },
             ]
         );

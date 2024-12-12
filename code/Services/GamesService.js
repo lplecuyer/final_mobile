@@ -37,8 +37,7 @@ class GamesService {
             }).then((r) => r.json());
     
             if (response.success) {
-                console.log("Jeu importé :", response.name);
-                return true;
+                return response.data;
             } else {
                 return false;
             }
@@ -51,14 +50,34 @@ class GamesService {
     async GetGameById(steam_game_id) {
         const response = await fetch("http://martha.jh.shawinigan.info/queries/select-game-by-id/execute", {
             method: 'POST',
-            body: JSON.stringify({steam_game_id}),
+            body: JSON.stringify({ steam_game_id }),
             headers: {
                 'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
             }
         }).then((r) => r.json());
 
         
+        console.log(response)
+        if (response.success){
+            const game = response.data[0];
+            return game;
+        } else {
+            console.warn("something wrong happened");
+        }
+        
+    }
 
+    async GetGame(id) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/select-game/execute", {
+            method: 'POST',
+            body: JSON.stringify({ id }),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        
+        console.log(response)
         if (response.success){
             const game = response.data[0];
             return game;
@@ -109,7 +128,7 @@ class GamesService {
             }
         }).then((r) => r.json());
 
-        if (response.success) {
+        if (response.success && response.data.length > 0) {
             return true;
         } else {
             return false;

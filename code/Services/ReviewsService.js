@@ -114,6 +114,23 @@ class ReviewsService {
             return false;
         }
     }
+
+    async GetReviewsForUser(user_id) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/select-all-reviews-for-user/execute", {
+            method: 'POST',
+            body: JSON.stringify({ user_id }),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+
+        if (response.success){
+            return response.data;
+        } else {
+            return [];
+        }
+    }
 }
 const ReviewService = new ReviewsService();
 export default ReviewService;
