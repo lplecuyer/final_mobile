@@ -138,13 +138,11 @@ styles = StyleSheet.create({
         width: '100%',
         height: 200,
         resizeMode: 'contain',
-        marginBottom: 20,
     },
     gameTitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 20,
+        textAlign: 'center'
     },
     label: {
         fontSize: 16,

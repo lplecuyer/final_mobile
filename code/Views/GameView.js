@@ -87,6 +87,7 @@ export default function GameView({ navigation, route }) {
                     <ActivityIndicator size="large" color="#0000ff" />
                 ) : (
                     <View>
+                        <Text style={styles.tinytext}> Niveau de completion </Text>
                         <Picker
                             selectedValue={gameStatus}
                             onValueChange={(itemValue) => setGameStatus(itemValue)}

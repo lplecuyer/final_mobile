@@ -17,9 +17,32 @@ export default function ReviewsList({ navigation, route }) {
     const [game_id, setGameId] = useState('');
     const [userOwnsGame, setUserOwnsGame] = useState(false);
     const [hasUserReviewed, setHasUserReviewed] = useState(false);
+    const [completionLevels, setCompletionLevels] = useState({});
 
 
-    // Fonction pour récupérer le nom du jeu
+
+    useEffect(() => {
+        const fetchCompletionLevels = async () => {
+            try {
+                const levels = {};
+                for (const review of reviews) {
+                    const user_id = review.user_id;
+                    const ids = { game_id, user_id };
+                    const completion = await GameService.getGameStatus(ids);
+                    levels[user_id] = completion[0]?.game_completed || "Non défini";
+                }
+                setCompletionLevels(levels);
+            } catch (error) {
+                console.error("Erreur lors de la récupération des niveaux de complétion :", error);
+            }
+        };
+    
+        if (reviews.length > 0) {
+            fetchCompletionLevels();
+        }
+    }, [reviews, game_id]);
+    
+
     useEffect(() => {
         const fetchGameName = async () => {
             try {
@@ -155,15 +178,17 @@ export default function ReviewsList({ navigation, route }) {
                             <TouchableOpacity style={reviewStyles.reviewCard}
                                 onPress={() => navigation.navigate('Review', { review: item })}>
                                 <Text style={[reviewStyles.reviewAuthor, { color: '#B1B1AE' }]}>
-                                    Auteur : {item.authorName}
+                                    Auteur : {item.authorName} 
+                                    {completionLevels[item.user_id] !== undefined && (
+                                        <Text> (Completion : {completionLevels[item.user_id]})</Text>
+                                    )}
                                 </Text>
                                 <Text style={[reviewStyles.reviewTitle, { color: '#B1B1AE' }]}>{item.title}</Text>
                                 <Text style={[reviewStyles.reviewContent, { color: '#B1B1AE' }]}>{item.description}</Text>
                                 <Text style={reviewStyles.reviewRating}>
                                     Note : <Rating disabled={true} size={15} baseColor='black' fillColor='white' rating={item.rating} />
                                 </Text>
-
-
+                        
                                 {item.user_id === loggedInUser.id && (
                                     <>
                                         <TouchableOpacity
@@ -172,7 +197,7 @@ export default function ReviewsList({ navigation, route }) {
                                         >
                                             <Text style={reviewStyles.editButtonText}>Modifier</Text>
                                         </TouchableOpacity>
-
+                        
                                         <TouchableOpacity
                                             style={[styles.ButtonMenu, { backgroundColor: "#8b0609" }]}
                                             onPress={() => HandleDelete(item.id)}
@@ -181,9 +206,10 @@ export default function ReviewsList({ navigation, route }) {
                                         </TouchableOpacity>
                                     </>
                                 )}
-
                             </TouchableOpacity>
                         )}
+                        
+                        
                     />
                 ) : (
                     <Text style={styles.tinytext}>
