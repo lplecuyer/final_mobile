@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Rating } from '@kolking/react-native-rating';
+import NavigationTemplate from '../Templates/NavigationTemplate.js';
 import styles from '../assets/styles.js';
 import ReviewService from '../Services/ReviewsService.js';
 import GameService from '../Services/GamesService.js';
@@ -132,76 +133,79 @@ export default function ReviewsList({ navigation, route }) {
 
 
     return (
-        <View style={[styles.background, { flex: 1, justifyContent: 'center', alignItems: 'center' }]}>
-            <Text style={[styles.title, { fontSize: 28, fontWeight: 'bold', marginTop: 10 }]}>
-                Reviews pour le jeu:{'\n'} {gameName || 'Chargement...'}
-            </Text>
-
-            {userOwnsGame && (
-                <Text style={{ fontSize: 16, color: '#00FF00', marginBottom: 10 }}>
-                    Vous possédez ce jeu.
+        <>
+            <View style={[styles.background, { flex: 1, justifyContent: 'center', alignItems: 'center' }]}>
+                <Text style={[styles.title, { fontSize: 28, fontWeight: 'bold', marginTop: 10 }]}>
+                    Reviews pour le jeu:{'\n'} {gameName || 'Chargement...'}
                 </Text>
-            )}
 
-            {loading ? (
-                <Text style={{ fontSize: 16, color: '#555' }}>Chargement des reviews...</Text>
-            ) : reviews.length > 0 ? (
-                <FlatList
-                    data={reviews}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity style={reviewStyles.reviewCard}
-                            onPress={() => navigation.navigate('Review', { review: item })}>
-                            <Text style={[reviewStyles.reviewAuthor, { color: '#B1B1AE' }]}>
-                                Auteur : {item.authorName}
-                            </Text>
-                            <Text style={[reviewStyles.reviewTitle, { color: '#B1B1AE' }]}>{item.title}</Text>
-                            <Text style={[reviewStyles.reviewContent, { color: '#B1B1AE' }]}>{item.description}</Text>
-                            <Text style={reviewStyles.reviewRating}>
-                                Note : <Rating disabled={true} size={15} baseColor='black' fillColor='white' rating={item.rating} />
-                            </Text>
+                {userOwnsGame && (
+                    <Text style={{ fontSize: 16, color: '#00FF00', marginBottom: 10 }}>
+                        Vous possédez ce jeu.
+                    </Text>
+                )}
+
+                {loading ? (
+                    <Text style={{ fontSize: 16, color: '#555' }}>Chargement des reviews...</Text>
+                ) : reviews.length > 0 ? (
+                    <FlatList
+                        data={reviews}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity style={reviewStyles.reviewCard}
+                                onPress={() => navigation.navigate('Review', { review: item })}>
+                                <Text style={[reviewStyles.reviewAuthor, { color: '#B1B1AE' }]}>
+                                    Auteur : {item.authorName}
+                                </Text>
+                                <Text style={[reviewStyles.reviewTitle, { color: '#B1B1AE' }]}>{item.title}</Text>
+                                <Text style={[reviewStyles.reviewContent, { color: '#B1B1AE' }]}>{item.description}</Text>
+                                <Text style={reviewStyles.reviewRating}>
+                                    Note : <Rating disabled={true} size={15} baseColor='black' fillColor='white' rating={item.rating} />
+                                </Text>
 
 
-                            {item.user_id === loggedInUser.id && (
-                                <>
-                                    <TouchableOpacity
-                                        style={styles.ButtonMenu}
-                                        onPress={() => navigation.navigate('ReviewUpdate', { item, game_id })}
-                                    >
-                                        <Text style={reviewStyles.editButtonText}>Modifier</Text>
-                                    </TouchableOpacity>
+                                {item.user_id === loggedInUser.id && (
+                                    <>
+                                        <TouchableOpacity
+                                            style={styles.ButtonMenu}
+                                            onPress={() => navigation.navigate('ReviewUpdate', { item, game_id })}
+                                        >
+                                            <Text style={reviewStyles.editButtonText}>Modifier</Text>
+                                        </TouchableOpacity>
 
-                                    <TouchableOpacity
-                                        style={[styles.ButtonMenu, { backgroundColor: "#8b0609" }]}
-                                        onPress={() => HandleDelete(item.id)}
-                                    >
-                                        <Text style={reviewStyles.editButtonText}>Supprimer</Text>
-                                    </TouchableOpacity>
-                                </>
-                            )}
+                                        <TouchableOpacity
+                                            style={[styles.ButtonMenu, { backgroundColor: "#8b0609" }]}
+                                            onPress={() => HandleDelete(item.id)}
+                                        >
+                                            <Text style={reviewStyles.editButtonText}>Supprimer</Text>
+                                        </TouchableOpacity>
+                                    </>
+                                )}
 
-                        </TouchableOpacity>
-                    )}
-                />
-            ) : (
-                <Text style={styles.tinytext}>
-                    Ce jeu n'a pas encore de reviews.
-                </Text>
-            )}
+                            </TouchableOpacity>
+                        )}
+                    />
+                ) : (
+                    <Text style={styles.tinytext}>
+                        Ce jeu n'a pas encore de reviews.
+                    </Text>
+                )}
 
-            {userOwnsGame && !hasUserReviewed && (
-                <TouchableOpacity style={styles.ButtonMenu} onPress={() => navigation.navigate('ReviewUpdate', { game_id })}>
-                    <Text style={reviewStyles.addReviewText}>Ajouter une Review !</Text>
-                </TouchableOpacity>
-            )}
+                {userOwnsGame && !hasUserReviewed && (
+                    <TouchableOpacity style={styles.ButtonMenu} onPress={() => navigation.navigate('ReviewUpdate', { game_id })}>
+                        <Text style={reviewStyles.addReviewText}>Ajouter une Review !</Text>
+                    </TouchableOpacity>
+                )}
 
-            {hasUserReviewed && (
-                <Text style={{ fontSize: 16, color: '#888', marginBottom: 10 }}>
-                    Merci pour votre Review!
-                </Text>
-            )}
+                {hasUserReviewed && (
+                    <Text style={{ fontSize: 16, color: '#888', marginBottom: 10 }}>
+                        Merci pour votre Review!
+                    </Text>
+                )}
 
-        </View>
+            </View>
+            <NavigationTemplate />
+        </>
     );
 }
 

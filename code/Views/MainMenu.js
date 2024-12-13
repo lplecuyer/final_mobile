@@ -24,7 +24,7 @@ export default function MainMenu({navigation}) {
                     </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity style={styles.ButtonMenu} onPress={() => navigation.navigate('User token')}>
+                <TouchableOpacity style={styles.ButtonMenu} onPress={() => navigation.navigate('UserToken')}>
                     <Text style={styles.textButtonMenu}>How to get your steam User Token</Text>
                 </TouchableOpacity>
 

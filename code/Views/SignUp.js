@@ -9,7 +9,7 @@ export default function SignUp({navigation}) {
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [token, setToken] = useState('');
-  const [steamId, setSteamId] = useState('');
+  const [steam_id, setSteamId] = useState('');
 
   const handleSignUp = () => {
     if (password !== passwordConfirmation) {
@@ -17,13 +17,13 @@ export default function SignUp({navigation}) {
       return;
     }
 
-    const credentials = { username, password };
+    const credentials = { username, password, token, steam_id };
 
     const isSignedUp = AuthService.signUp(credentials);
 
     if (isSignedUp) {
       alert('Sign up successful!');
-      navigation.navigate('Main menu'); // Adjust according to your app navigation flow.
+      navigation.navigate('MainMenu');
     } else {
       alert('Sign up failed! Username might already be taken.');
     }
@@ -61,7 +61,7 @@ export default function SignUp({navigation}) {
       <Text style={styles.smallText}>Steam Id</Text>
       <TextInput
         style={styles.textInput}
-        value={steamId}
+        value={steam_id}
         onChangeText={setSteamId}
       />
       <View style={styles.buttonContainer}>

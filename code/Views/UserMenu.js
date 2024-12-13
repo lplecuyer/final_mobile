@@ -7,7 +7,7 @@ import AuthService from '../authentification/AuthService.js';
 import GameService from '../Services/GamesService.js';
 import ReviewService from '../Services/ReviewsService.js';
 
-export default function UserMenu({navigation}) {
+export default function UserMenu({ navigation }) {
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
     const [userGames, setUserGames] = useState([]);
@@ -40,10 +40,10 @@ export default function UserMenu({navigation}) {
 
                 const reviewsWithGameNames = await Promise.all(userReviews.map(async (review) => {
                     const id = review.game_id
-                    const gameDetails = await GameService.GetGame(id);  
+                    const gameDetails = await GameService.GetGame(id);
                     return {
                         ...review,
-                        game_name: gameDetails ? gameDetails.name : 'Jeu inconnu',  
+                        game_name: gameDetails ? gameDetails.name : 'Jeu inconnu',
                     };
                 }));
 
@@ -61,7 +61,6 @@ export default function UserMenu({navigation}) {
         const fetchGames = async () => {
             try {
                 setLoading(true);
-                console.log(loggedInUser);
                 const userGamesData = await ShtweamService.GetGamesForUser(loggedInUser.token, loggedInUser.steam_id);
 
                 const gamesWithDetails = await Promise.all(
@@ -176,25 +175,48 @@ export default function UserMenu({navigation}) {
         }
     };
 
+    const handleLogout = async () => {
+        try {
+            await AuthService.logout();
+            Toast.show({
+                type: 'success',
+                text1: 'Déconnexion réussie',
+                position: 'top',
+            });
+            navigation.navigate('MainMenu'); 
+        } catch (error) {
+            console.error("Erreur lors de la déconnexion :", error);
+            Toast.show({
+                type: 'error',
+                text1: 'Erreur',
+                text2: 'Impossible de se déconnecter.',
+                position: 'top',
+            });
+        }
+    };
+    
+
 
     return (
         <View style={styles.background}>
             <View style={styles.menucontainer}>
-                <View style={[styles.userContainer, { marginLeft: 20 }]}>
+                <View style={[styles.userContainer, { marginLeft: 20, alignItems: 'center' }]}>
                     <View style={styles.logoContainer}>
                         <Image
                             source={userImage ? { uri: userImage } : require('../assets/User_Icon.png')}
                             style={styles.logo}
                         />
                     </View>
-                    <View style={{marginLeft: 15}}>
-                        <Text style={[styles.title, { marginTop: 30 }]}>{loggedInUser.username}</Text>
-                        <Text style={styles.smallText}>Level</Text>
-                        <Text style={styles.smallText}>Achievement : 42</Text>
+                    <View style={{ marginTop: 25, alignItems: 'center' }}>
+                        <Text style={[styles.title, { marginTop: 10 }]}>{loggedInUser.username}</Text>
+                        <TouchableOpacity onPress={handleLogout} style={[styles.button, { backgroundColor: 'crimson', marginTop: 10 }]}>
+                            <Text style={[styles.title, { fontSize: 10 }]}>Se déconnecter</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
 
-                <View style={styles.reviewContainerContainer}>
+
+                <View style={[styles.reviewContainerContainer, { bottom: 5 }]}>
                     <Text style={[styles.smallText, { marginLeft: 0 }]}>Reviews</Text>
                     <View style={styles.reviewContainer}>
                         <FlatList
@@ -202,7 +224,7 @@ export default function UserMenu({navigation}) {
                             renderItem={({ item }) => (
                                 <TouchableOpacity style={styles.review} onPress={() => navigation.navigate('Review', { review: item })}>
                                     <Text style={styles.title}>{item.title}</Text>
-                                    <Text style={styles.smallText}>{item.game_name}</Text>
+                                    <Text style={styles.title}>{item.game_name}</Text>
                                     <Text style={styles.smallText}>{item.description}</Text>
                                 </TouchableOpacity>
                             )}
@@ -222,7 +244,21 @@ export default function UserMenu({navigation}) {
                     data={games}
                     keyExtractor={(item) => item.appid.toString()}
                     renderItem={({ item }) => (
-                        <View style={styles.gameContainer}>
+                        <TouchableOpacity
+                            style={styles.gameContainer}
+                            onPress={() => {
+                                if (importedGames[item.appid]) {
+                                    navigation.navigate('GameView', { game: item });
+                                } else {
+                                    Toast.show({
+                                        type: 'info',
+                                        text1: 'Jeu non importé',
+                                        text2: `Veuillez importer ${item.name} avant d'accéder aux détails.`,
+                                        position: 'top',
+                                    });
+                                }
+                            }}
+                        >
                             {item.header_image ? (
                                 <Image source={{ uri: item.header_image }} style={styles.gameIcon} />
                             ) : (
@@ -238,8 +274,7 @@ export default function UserMenu({navigation}) {
                                     <Text style={styles.unimportButtonText}>Unimport</Text>
                                 </TouchableOpacity>
                             )}
-
-                        </View>
+                        </TouchableOpacity>
                     )}
                 />
             ) : (
@@ -247,13 +282,7 @@ export default function UserMenu({navigation}) {
             )}
 
             <TouchableOpacity
-                style={{
-                    backgroundColor: '#535353',
-                    padding: 15,
-                    borderRadius: 10,
-                    marginTop: 20,
-                    alignItems: 'center',
-                }}
+                style={styles.button}
                 onPress={handleImportGames}
             >
                 <Text style={{ color: '#fff', fontSize: 16 }}>Importer mes jeux Steam</Text>
@@ -296,12 +325,11 @@ const styles = StyleSheet.create({
     logoContainer: {
         justifyContent: 'flex-start',
         flexDirection: 'row',
-        top: 10,
+        top: 35,
     },
     logo: {
         width: 100,
-        height: 100,
-        left: 10,
+        height: 100
     },
     userContainer: {
         width: '40%',
@@ -365,7 +393,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 15,
         marginBottom: 10,
-        elevation: 4, 
+        elevation: 4,
         alignItems: 'flex-start',
         justifyContent: 'center',
     },
@@ -386,5 +414,11 @@ const styles = StyleSheet.create({
         color: '#B1B1AE',
         marginTop: 5,
         fontSize: 16,
+    },
+    button: {
+        backgroundColor: '#4BB50D',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 8,
     },
 });

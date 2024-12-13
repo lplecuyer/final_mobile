@@ -133,6 +133,39 @@ styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 20,
+    },
+    gameImage: {
+        width: '100%',
+        height: 200,
+        resizeMode: 'contain',
+        marginBottom: 20,
+    },
+    gameTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    label: {
+        fontSize: 16,
+        marginBottom: 10,
+    },
+    picker: {
+        height: 50,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 5,
+        marginBottom: 20,
+    },
+    saveButton: {
+        backgroundColor: '#007bff',
+        padding: 15,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    saveButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     }
     
 });

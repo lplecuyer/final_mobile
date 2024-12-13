@@ -5,18 +5,27 @@ import styles from '../assets/styles.js';
 
 export default function BaseTemplate({ children }) {
     const navigation = useNavigation();
+    
+    const handleGoBack = () => {
+        if (navigation.canGoBack()) {
+            navigation.goBack(); // Go back to the previous screen if available
+        } else {
+            navigation.navigate('MainMenu'); // Navigate to 'MainMenu' if no previous screen exists
+        }
+    };
+
     return (
-        <SafeAreaView style={{ flexGrow: 1}}>
+        <SafeAreaView style={{ flexGrow: 1 }}>
             <StatusBar barStyle="light-content" backgroundColor="#121212" />
-            <View style={[styles.header, {elevation: 10}]}>
-                <TouchableOpacity  onPress={() => navigation.navigate('Main menu')}>
-                    <Image source={require('../assets/steam_bird.png')} style={styles.logo}/>
+            <View style={[styles.header, { elevation: 10 }]}>
+                <TouchableOpacity onPress={handleGoBack}>
+                    <Image source={require('../assets/steam_bird.png')} style={styles.logo} />
                 </TouchableOpacity>
                 <Text style={{ fontSize: 36, textAlign: 'left', color: '#9B9B9B', fontWeight: 'bold', flex: 1, marginLeft: '10%' }}>
                     Shtweam
                 </Text>
             </View>
-            <View style={{flexGrow: 1}}>
+            <View style={{ flexGrow: 1 }}>
                 {children}
             </View>
         </SafeAreaView>

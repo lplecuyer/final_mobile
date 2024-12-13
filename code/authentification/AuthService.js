@@ -22,6 +22,29 @@ class AuthService {
 
         return this.currentUser
     }
+
+    async signUp(credentials) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/insert-user/execute", {
+            method: 'POST',
+            body: JSON.stringify(credentials),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+                         
+            }
+        }).then((r) => r.json());
+
+        if (response.success)  {
+            return true;
+        } else {
+            return false;
+        }
+
+        return this.currentUser
+    }
+
+    async logout() {
+        this.currentUser = null;
+    }
 }
 
 const service = new AuthService()

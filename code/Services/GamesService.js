@@ -57,7 +57,6 @@ class GamesService {
         }).then((r) => r.json());
 
         
-        console.log(response)
         if (response.success){
             const game = response.data[0];
             return game;
@@ -77,7 +76,25 @@ class GamesService {
         }).then((r) => r.json());
 
         
-        console.log(response)
+        if (response.success){
+            const game = response.data[0];
+            return game;
+        } else {
+            console.warn("something wrong happened");
+        }
+        
+    }
+
+    async GetGameByName(name) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/select-game-by-name/execute", {
+            method: 'POST',
+            body: JSON.stringify({ name }),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        
         if (response.success){
             const game = response.data[0];
             return game;
@@ -129,6 +146,38 @@ class GamesService {
         }).then((r) => r.json());
 
         if (response.success && response.data.length > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    async getGameStatus(ids) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/select-usersgames-status/execute", {
+            method: 'POST',
+            body: JSON.stringify({ids}),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        if (response.success && response.data.length > 0) {
+            return response.data;
+        } else {
+            return false;
+        }
+    }
+
+    async updateGameStatus(statusforgame) {
+        const response = await fetch("http://martha.jh.shawinigan.info/queries/insert-usersgames-status/execute", {
+            method: 'POST',
+            body: JSON.stringify({statusforgame}),
+            headers: {
+                'auth': 'c2h0d2VhbTp3aXY5MzROIzlCZkFH'
+            }
+        }).then((r) => r.json());
+
+        if (response.success) {
             return true;
         } else {
             return false;

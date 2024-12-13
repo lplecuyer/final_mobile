@@ -12,6 +12,7 @@ import GamesList from './Views/GamesList.js';
 import ReviewsList from './Views/ReviewsList.js';
 import ReviewUpdate from './Views/ReviewUpdate.js';
 import UpdateComment from './Views/UpdateComment.js';
+import GameView from './Views/GameView.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +31,7 @@ export default function App() {
                   <Stack.Screen name="ReviewsList" component={ReviewsList} />
                   <Stack.Screen name="ReviewUpdate" component={ReviewUpdate} />
                   <Stack.Screen name="UpdateComment" component={UpdateComment} />
+                  <Stack.Screen name="GameView" component={GameView} />
               </Stack.Navigator>
               
           <Toast />
