@@ -1,0 +1,16 @@
+# Ignorer les fichiers de configuration spécifiques
+*.log
+*.env
+
+# Ignorer les fichiers spécifiques au système d'exploitation (ex. macOS)
+.DS_Store
+
+# Ignorer les fichiers de l'éditeur de texte (ex. VSCode)
+.vscode/
+
+# Ignorer les dossiers node_modules (si tu utilises Node.js)
+node_modules/
+
+# Ignorer les fichiers temporaires créés par l'IDE
+*.swp
+*.bak
