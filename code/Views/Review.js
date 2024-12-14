@@ -10,7 +10,7 @@ export default function Review({ route }) {
     const [comments, setComments] = useState([]);
     const [newText, setNewComment] = useState('');
     const [loading, setLoading] = useState(true);
-    const [editCommentId, setEditCommentId] = useState(null); // Pour suivre le commentaire en édition
+    const [editCommentId, setEditCommentId] = useState(null);
 
     const loggedInUser = AuthService.currentUser;
     const navigation = useNavigation();

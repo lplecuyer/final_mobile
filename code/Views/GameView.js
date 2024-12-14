@@ -69,6 +69,7 @@ export default function GameView({ navigation, route }) {
             const statusforgame = { game_id, gameStatus, user_id };
             await GameService.updateGameStatus(statusforgame);
             alert('Game status updated successfully!');
+            navigation.goBack();
         } catch (error) {
             console.error('Error updating game status:', error);
             alert('Failed to update game status.');

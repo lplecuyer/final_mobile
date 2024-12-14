@@ -1,35 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { useFocusEffect } from '@react-navigation/native';
 import styles from '../assets/styles.js';
 import NavigationTemplate from '../Templates/NavigationTemplate.js';
-import ShtweamService from '../Services/SteamService.js';
 import GameService from '../Services/GamesService.js';
 
 export default function GamesList({ navigation }) {
-    const [selectedFilter, setSelectedFilter] = useState("OrderAZ");
+    const [selectedFilter, setSelectedFilter] = useState("default");
     const [searchText, setSearchText] = useState("");
     const [gameNames, setGameNames] = useState([]);
     const [filteredGames, setFilteredGames] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        async function fetchGames() {
-            const games = await Get_all_games();
-            setGameNames(games);
-            setFilteredGames(games);
-            setIsLoading(false);
-        }
-        fetchGames();
-    }, []);
+    
+    useFocusEffect(
+        useCallback(() => {
+            async function fetchGames() {
+                setIsLoading(true);
+                try {
+                    const games = await GameService.GetAllGames();
+                    setGameNames(games);
+                    setFilteredGames(games);
+                } catch (error) {
+                    console.error("Erreur lors de la récupération des jeux :", error);
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+            fetchGames();
+        }, [])
+    );
 
-    useEffect(() => {
-        handleSearch();
-    }, [searchText]);
+    
+    useFocusEffect(
+        useCallback(() => {
+            handleSearch();
+        }, [searchText])
+    );
 
-    useEffect(() => {
-        handleSort();
-    }, [selectedFilter]);
+    useFocusEffect(
+        useCallback(() => {
+            handleSort();
+        }, [selectedFilter])
+    );
 
     const handleSearch = () => {
         const filtered = gameNames.filter(game =>
@@ -41,13 +55,9 @@ export default function GamesList({ navigation }) {
     const handleSort = () => {
         const sorted = [...filteredGames];
         if (selectedFilter === "OrderAZ") {
-            sorted.sort((a, b) => a.name.localeCompare(b.name)); // A-Z
+            sorted.sort((a, b) => a.name.localeCompare(b.name)); 
         } else if (selectedFilter === "OrderZA") {
-            sorted.sort((a, b) => b.name.localeCompare(a.name)); // Z-A
-        } else if (selectedFilter === "DateNewOld") {
-            sorted.sort((a, b) => b.appid - a.appid); // Newest first
-        } else if (selectedFilter === "DateOldNew") {
-            sorted.sort((a, b) => a.appid - b.appid); // Oldest first
+            sorted.sort((a, b) => b.name.localeCompare(a.name)); 
         }
         setFilteredGames(sorted);
     };
@@ -70,16 +80,15 @@ export default function GamesList({ navigation }) {
                                 dropdownIconColor="white"
                                 selectedValue={selectedFilter}
                                 onValueChange={(itemValue) => setSelectedFilter(itemValue)}>
-                                <Picker.Item label="Alphabetical ordered Name" value="OrderAZ" />
-                                <Picker.Item label="Reversed alphabetical ordered Name" value="OrderZA" />
-                                <Picker.Item label="Date added to Steam newest -> oldest" value="DateNewOld" />
-                                <Picker.Item label="Date added to Steam oldest -> newest" value="DateOldNew" />
+                                <Picker.Item label="Trier par " value="default" />
+                                <Picker.Item label="Alphabetique" value="OrderAZ" />
+                                <Picker.Item label="Alphabetique inverse" value="OrderZA" />
                             </Picker>
                         </View>
                         <View style={{ width: "50%", alignItems: "center", justifyContent: "center" }}>
                             <TextInput
                                 style={styles.SearchBar}
-                                placeholder="Search Game"
+                                placeholder="Rechercher un jeu"
                                 value={searchText}
                                 onChangeText={setSearchText}
                                 onSubmitEditing={handleSearch}
@@ -111,9 +120,4 @@ export default function GamesList({ navigation }) {
             )}
         </View>
     );
-
-    async function Get_all_games() {
-        const result = await GameService.GetAllGames();
-        return result;
-    }
 }

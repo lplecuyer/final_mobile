@@ -1,23 +1,35 @@
 import React, { useState } from 'react';
-import {StyleSheet, View, Text, TextInput, TouchableOpacity} from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import Toast from 'react-native-toast-message';
 import AuthService from '../authentification/AuthService';
 
-
-export default function Login({navigation}) {
+export default function Login({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
   const handleSignUp = async () => {
-    const credentials = {username, password}
-        try {
-            const result = await AuthService.logIn(credentials);
-            if (result != null) {
-              navigation.navigate('GamesList');
-            }
-        } catch (error) {
-            console.error('Erreur lors de l’appel API:', error);
-            console.log('Erreur', 'Impossible de récupérer les informations utilisateur.');
-        }
-    };
+    const credentials = { username, password };
+    try {
+      const result = await AuthService.logIn(credentials);
+      if (result != null) {
+        navigation.navigate('GamesList');
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Erreur de connexion',
+          text2: "Aucune donnée utilisateur n'a été trouvée.",
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de l’appel API:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Erreur',
+        text2: 'Impossible de récupérer les informations utilisateur.',
+      });
+    }
+  };
+
   return (
     <View style={styles.background}>
       <Text style={styles.bigText}>Connexion</Text>
