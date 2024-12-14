@@ -13,6 +13,7 @@ export default function UserMenu({ navigation }) {
     const [userGames, setUserGames] = useState([]);
     const [userImage, setUserImage] = useState(null);
     const [reviews, setReviews] = useState([]);
+    const [checkingGames, setCheckingGames] = useState({});
     const loggedInUser = AuthService.currentUser;
 
     const [importedGames, setImportedGames] = useState({});
@@ -90,13 +91,12 @@ export default function UserMenu({ navigation }) {
             const { name, header_image, appid } = game;
             const user_id = loggedInUser.id;
 
-
-            const isImported = importedGames[appid];
+            const isImported = await isGameImported(appid);
 
             if (!isImported) {
                 const infos = { name, header_image, appid, user_id };
                 try {
-                    const response = await GameService.ImportGame(infos);
+                    await GameService.ImportGame(infos);
                     setImportedGames((prev) => ({
                         ...prev,
                         [appid]: true,
@@ -151,9 +151,13 @@ export default function UserMenu({ navigation }) {
     useEffect(() => {
         const fetchUserImage = async () => {
             try {
-                const userInfo = await ShtweamService.GetUser(loggedInUser.token, loggedInUser.steam_id);
-                if (userInfo && userInfo.avatar) {
-                    setUserImage(userInfo.avatar);
+                const token = loggedInUser.token;
+                const steam_id = loggedInUser.steam_id;
+                const stuff = { token, steam_id };
+                const userInfo = await ShtweamService.GetUser(stuff);
+                console.log(userInfo);
+                if (userInfo && userInfo.avatarfull) {
+                    setUserImage(userInfo.avatarfull);
                 }
             } catch (error) {
                 console.error("Erreur en récupérant l'image de l'utilisateur :", error);
@@ -164,14 +168,17 @@ export default function UserMenu({ navigation }) {
     }, [loggedInUser]);
 
     const isGameImported = async (appid) => {
+        setCheckingGames((prev) => ({ ...prev, [appid]: true }));
         try {
             const user_id = loggedInUser.id;
-            const ids = { user_id, appid }
+            const ids = { user_id, appid };
             const result = await GameService.UserHasGame(ids);
             return result;
         } catch (error) {
             console.error("Erreur lors de la vérification du jeu importé :", error);
             return false;
+        } finally {
+            setCheckingGames((prev) => ({ ...prev, [appid]: false }));
         }
     };
 
@@ -183,7 +190,7 @@ export default function UserMenu({ navigation }) {
                 text1: 'Déconnexion réussie',
                 position: 'top',
             });
-            navigation.navigate('MainMenu'); 
+            navigation.navigate('MainMenu');
         } catch (error) {
             console.error("Erreur lors de la déconnexion :", error);
             Toast.show({
@@ -194,7 +201,7 @@ export default function UserMenu({ navigation }) {
             });
         }
     };
-    
+
 
 
     return (
@@ -219,22 +226,26 @@ export default function UserMenu({ navigation }) {
                 <View style={[styles.reviewContainerContainer, { bottom: 5 }]}>
                     <Text style={[styles.smallText, { marginLeft: 0 }]}>Reviews</Text>
                     <View style={styles.reviewContainer}>
-                        <FlatList
-                            data={reviews}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity style={styles.review} onPress={() => navigation.navigate('Review', { review: item })}>
-                                    <Text style={styles.title}>{item.title}</Text>
-                                    <Text style={styles.title}>{item.game_name}</Text>
-                                    <Text style={styles.smallText}>{item.description}</Text>
-                                </TouchableOpacity>
-                            )}
-                            keyExtractor={(item) => item.id.toString()}
-                        />
+                        {reviews.length === 0 ? (
+                            <Text style={styles.noReviewsText}>Aucune review pour l'instant</Text>
+                        ) : (
+                            <FlatList
+                                data={reviews}
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity style={styles.review} onPress={() => navigation.navigate('Review', { review: item })}>
+                                        <Text style={styles.title}>{item.title}</Text>
+                                        <Text style={[styles.title, { fontSize: 10, color: "gray" }]}>{item.game_name}</Text>
+                                    </TouchableOpacity>
+                                )}
+                                keyExtractor={(item) => item.id.toString()}
+                            />
+                        )}
                     </View>
                 </View>
+
             </View>
 
-            <Text style={styles.bigText}>My Games</Text>
+            <Text style={styles.bigText}>Mes Jeux</Text>
 
             {loading ? (
                 <Text style={{ color: '#fff', marginVertical: 20 }}>Chargement des jeux...</Text>
@@ -264,19 +275,28 @@ export default function UserMenu({ navigation }) {
                             ) : (
                                 <Image source={require('../assets/User_Icon.png')} style={styles.gameIcon} />
                             )}
-                            <Text style={styles.smallText}>{item.name}</Text>
 
-                            {importedGames[item.appid] && (
-                                <TouchableOpacity
-                                    style={styles.unimportButton}
-                                    onPress={() => handleUnimportGame(item.appid)}
-                                >
-                                    <Text style={styles.unimportButtonText}>Unimport</Text>
-                                </TouchableOpacity>
+                            <Text style={styles.smallText} numberOfLines={2} ellipsizeMode="tail">{item.name}</Text>
+
+                            {checkingGames[item.appid] ? (
+                                <Image
+                                    source={require('../assets/steam_bird.png')}
+                                    style={styles.loadingIcon}
+                                />
+                            ) : (
+                                importedGames[item.appid] && (
+                                    <TouchableOpacity
+                                        style={styles.unimportButton}
+                                        onPress={() => handleUnimportGame(item.appid)}
+                                    >
+                                        <Text style={styles.unimportButtonText}>Unimport</Text>
+                                    </TouchableOpacity>
+                                )
                             )}
                         </TouchableOpacity>
                     )}
                 />
+
             ) : (
                 <Text style={{ color: '#fff', marginVertical: 20 }}>Aucun jeu pour l'instant.</Text>
             )}
@@ -313,6 +333,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'left',
         flexShrink: 1,
+        width: "80%"
     },
     menucontainer: {
         backgroundColor: '#121315',
@@ -360,6 +381,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginBottom: 10,
         alignItems: 'center',
+        flexWrap: "wrap"
     },
     gameIcon: {
         marginLeft: 10,
@@ -385,7 +407,7 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingVertical: 10,
         paddingHorizontal: 15,
-        marginBottom: 15,
+        marginBottom: 20,
     },
 
     reviewTouchable: {
@@ -401,9 +423,10 @@ const styles = StyleSheet.create({
         width: '90%',
         padding: 10,
         backgroundColor: '#444',
+        height: 100,
         borderRadius: 10,
         marginBottom: 10,
-        marginLeft: 15,
+        marginLeft: 10,
     },
     title: {
         fontSize: 18,
@@ -412,13 +435,29 @@ const styles = StyleSheet.create({
     },
     smallText: {
         color: '#B1B1AE',
-        marginTop: 5,
-        fontSize: 16,
+        marginTop: 10,
+        marginLeft: 10,
+        fontSize: 20,
+        textAlign: 'left',
+        flexShrink: 1,
+        width: '60%',
     },
     button: {
         backgroundColor: '#4BB50D',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 8,
+    },
+    noReviewsText: {
+        textAlign: 'center',
+        fontSize: 16,
+        color: '#888',
+        marginTop: '50%',
+    },
+    loadingIcon: {
+        width: 20,
+        height: 20,
+        marginLeft: 'auto',
+        marginRight: 10,
     },
 });

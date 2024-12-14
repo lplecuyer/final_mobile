@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import CommentsService from '../Services/CommentsService';
 
 export default function UpdateComment({ route, navigation }) {
-    const { commentId, initialText } = route.params; // Récupère les paramètres passés par navigation
+    const { commentId, initialText } = route.params;
     const [updatedText, setUpdatedText] = useState(initialText);
 
     const handleUpdate = async () => {
@@ -14,7 +14,7 @@ export default function UpdateComment({ route, navigation }) {
 
         try {
             await CommentsService.UpdateComment(commentId, { description: updatedText });
-            navigation.goBack(); // Retourner à la fenêtre précédente
+            navigation.goBack();
         } catch (error) {
             console.error("Erreur lors de la mise à jour du commentaire :", error);
         }

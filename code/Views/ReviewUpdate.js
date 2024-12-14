@@ -1,24 +1,36 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { Rating } from '@kolking/react-native-rating';
 import styles from '../assets/styles.js';
 import AuthService from '../authentification/AuthService.js';
 import ReviewService from '../Services/ReviewsService.js';
 
 export default function ReviewUpdate({ navigation, route }) {
-    const { item, game_id } = route.params || {}; // `item` peut être null ou undefined
+    const { item, game_id } = route.params || {}; 
     const loggedInUser = AuthService.currentUser;
 
-    // Initialiser les états
     const [title, setTitle] = useState(item?.title || '');
     const [description, setDescription] = useState(item?.description || '');
     const [rating, setRating] = useState(item?.rating || 0);
 
-    // Fonction pour sauvegarder (création ou mise à jour)
+    
+    const sanitizeInput = (input) => {
+        return input.trim().replace(/[^\w\s]/gi, '');
+    };
+
+    // Vérifier que le titre a plus de 5 caractères
     const handleSave = async () => {
+        if (title.length <= 5) {
+            Alert.alert('Erreur', 'Le titre doit contenir plus de 5 caractères.');
+            return;
+        }
+
+        const sanitizedTitle = sanitizeInput(title);
+        const sanitizedDescription = sanitizeInput(description);
+
         const inputs = {
-            title,
-            description,
+            title: sanitizedTitle,
+            description: sanitizedDescription,
             rating,
             game_id,
             user_id: loggedInUser.id,
@@ -26,12 +38,10 @@ export default function ReviewUpdate({ navigation, route }) {
 
         try {
             if (item) {
-                // Mise à jour
                 inputs.id = item.id;
                 await ReviewService.UpdateReview(inputs);
                 console.log('Review mise à jour:', inputs);
             } else {
-                // Création
                 await ReviewService.CreateReview(inputs);
                 console.log('Nouvelle review créée:', inputs);
             }
@@ -41,7 +51,6 @@ export default function ReviewUpdate({ navigation, route }) {
         }
     };
 
-    // Gestion de la note
     const handleChange = useCallback((newRating) => setRating(newRating), []);
 
     return (

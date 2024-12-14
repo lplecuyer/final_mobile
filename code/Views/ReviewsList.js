@@ -36,12 +36,12 @@ export default function ReviewsList({ navigation, route }) {
                 console.error("Erreur lors de la récupération des niveaux de complétion :", error);
             }
         };
-    
+
         if (reviews.length > 0) {
             fetchCompletionLevels();
         }
     }, [reviews, game_id]);
-    
+
 
     useEffect(() => {
         const fetchGameName = async () => {
@@ -67,23 +67,23 @@ export default function ReviewsList({ navigation, route }) {
                     const user_id = loggedInUser.id;
                     const condition = { game_id, user_id };
                     const ownsGame = await ReviewService.CheckIfUserOwnsGameAndReviewed(condition);
-    
+
                     setUserOwnsGame(ownsGame[0].owns_game);
                     setHasUserReviewed(ownsGame[0].has_reviewed);
                 } catch (error) {
                     console.error("Erreur lors de la vérification de la possession du jeu :", error);
                 }
             };
-    
+
             if (game_id) {
                 checkUserOwnership();
             }
-    
+
             return () => {
                 setUserOwnsGame(false);
                 setHasUserReviewed(false);
             };
-        }, [game_id, loggedInUser.id]) 
+        }, [game_id, loggedInUser.id])
     );
 
     useFocusEffect(
@@ -97,7 +97,7 @@ export default function ReviewsList({ navigation, route }) {
                     setLoading(true);
 
                     const user_id = loggedInUser.id;
-                    const ids = {game_id, user_id};
+                    const ids = { game_id, user_id };
 
                     const fetchedReviews = await ReviewService.GetAllReviewsForGame(ids);
                     setReviews(fetchedReviews);
@@ -114,13 +114,13 @@ export default function ReviewsList({ navigation, route }) {
             }
 
             return () => {
-                setReviews([]); 
+                setReviews([]);
                 setLoading(false);
             };
         }, [game_id])
     );
 
-    
+
 
     const HandleDelete = (reviewId) => {
         Alert.alert(
@@ -178,17 +178,20 @@ export default function ReviewsList({ navigation, route }) {
                             <TouchableOpacity style={reviewStyles.reviewCard}
                                 onPress={() => navigation.navigate('Review', { review: item })}>
                                 <Text style={[reviewStyles.reviewAuthor, { color: '#B1B1AE' }]}>
-                                    Auteur : {item.authorName} 
-                                    {completionLevels[item.user_id] !== undefined && (
-                                        <Text> (Completion : {completionLevels[item.user_id]})</Text>
-                                    )}
+                                    Auteur : {item.authorName}
                                 </Text>
+                                {completionLevels[item.user_id] !== undefined && (
+                                    <Text style={[reviewStyles.reviewAuthor, { color: '#B1B1AE' }]}>
+                                        (Completion : {completionLevels[item.user_id]})
+                                    </Text>
+                                )}
+
                                 <Text style={[reviewStyles.reviewTitle, { color: '#B1B1AE' }]}>{item.title}</Text>
                                 <Text style={[reviewStyles.reviewContent, { color: '#B1B1AE' }]}>{item.description}</Text>
                                 <Text style={reviewStyles.reviewRating}>
                                     Note : <Rating disabled={true} size={15} baseColor='black' fillColor='white' rating={item.rating} />
                                 </Text>
-                        
+
                                 {item.user_id === loggedInUser.id && (
                                     <>
                                         <TouchableOpacity
@@ -197,7 +200,7 @@ export default function ReviewsList({ navigation, route }) {
                                         >
                                             <Text style={reviewStyles.editButtonText}>Modifier</Text>
                                         </TouchableOpacity>
-                        
+
                                         <TouchableOpacity
                                             style={[styles.ButtonMenu, { backgroundColor: "#8b0609" }]}
                                             onPress={() => HandleDelete(item.id)}
@@ -208,26 +211,34 @@ export default function ReviewsList({ navigation, route }) {
                                 )}
                             </TouchableOpacity>
                         )}
-                        
-                        
+
+
                     />
                 ) : (
-                    <Text style={styles.tinytext}>
-                        Ce jeu n'a pas encore de reviews.
-                    </Text>
+                    <View>
+                        <Text style={styles.tinytext}>
+                            Ce jeu n'a pas encore de reviews.
+                        </Text>
+                    </View>
                 )}
 
                 {userOwnsGame && !hasUserReviewed && (
-                    <TouchableOpacity style={styles.ButtonMenu} onPress={() => navigation.navigate('ReviewUpdate', { game_id })}>
+                    <TouchableOpacity
+                        style={styles.ButtonMenu}
+                        onPress={() => navigation.navigate('ReviewUpdate', { game_id })}
+                    >
                         <Text style={reviewStyles.addReviewText}>Ajouter une Review !</Text>
                     </TouchableOpacity>
                 )}
 
                 {hasUserReviewed && (
-                    <Text style={{ fontSize: 16, color: '#888', marginBottom: 10 }}>
-                        Merci pour votre Review!
-                    </Text>
+                    <View>
+                        <Text style={{ fontSize: 16, color: '#888', marginBottom: 10 }}>
+                            Merci pour votre Review!
+                        </Text>
+                    </View>
                 )}
+
 
             </View>
             <NavigationTemplate />

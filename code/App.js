@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { LogBox } from 'react-native';
 import Toast from 'react-native-toast-message';
 import MainMenu from './Views/MainMenu.js';
 import Login from './Views/Login.js';
@@ -15,6 +16,8 @@ import UpdateComment from './Views/UpdateComment.js';
 import GameView from './Views/GameView.js';
 
 const Stack = createNativeStackNavigator();
+
+LogBox.ignoreLogs(['Text strings must be rendered within a <Text> component']);
 
 export default function App() {
   return (

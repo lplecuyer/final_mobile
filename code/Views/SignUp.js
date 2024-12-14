@@ -1,75 +1,135 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity, ScrollView } from 'react-native';
-import AuthService from'../authentification/AuthService.js'
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import Toast from 'react-native-toast-message'; // Import de Toast
+import AuthService from '../authentification/AuthService.js';
+import ShtweamService from '../Services/SteamService.js';
 
-
-
-export default function SignUp({navigation}) {
+export default function SignUp({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [token, setToken] = useState('');
   const [steam_id, setSteamId] = useState('');
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
+    if (username.length <= 0) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Erreur',
+        text2: 'Votre nom ne doit pas être vide.',
+      });
+      return;
+    }
+
+    if (password.length < 4) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Erreur',
+        text2: 'Votre mot de passe doit contenir au minimum 4 caractères.',
+      });
+      return;
+    }
+
     if (password !== passwordConfirmation) {
-      alert('Passwords do not match!');
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Erreur',
+        text2: 'Les mots de passe ne correspondent pas.',
+      });
+      return;
+    }
+
+    try {
+      const user_check = { steam_id, token };
+      const userExists = await ShtweamService.GetUser(user_check);
+      if (!userExists) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Erreur',
+          text2: 'Le compte Steam est inexistant.',
+        });
+        return;
+      }
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Erreur API',
+        text2: `Erreur lors de l'appel API: soit la clé d'API ou le Steam_id est invalide`,
+      });
       return;
     }
 
     const credentials = { username, password, token, steam_id };
 
-    const isSignedUp = AuthService.signUp(credentials);
+    const isSignedUp = await AuthService.signUp(credentials);
 
     if (isSignedUp) {
-      alert('Sign up successful!');
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        text1: 'Succès',
+        text2: 'Inscription réussie!',
+      });
       navigation.navigate('MainMenu');
     } else {
-      alert('Sign up failed! Username might already be taken.');
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Erreur',
+        text2: "Un problème s'est produit.",
+      });
     }
   };
+
   return (
     <ScrollView>
-    <View style={styles.background}>
-      <Text style={styles.bigText}>SignUp</Text>
-      <Text style={styles.smallText}>Username</Text>
-      <TextInput
-        style={styles.textInput}
-        value={username}
-        onChangeText={setUsername}
-      />
-      <Text style={styles.smallText}>Password</Text>
-      <TextInput
-        style={styles.textInput}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      <Text style={styles.smallText}>Password Confirmation</Text>
-      <TextInput
-        style={styles.textInput}
-        secureTextEntry
-        value={passwordConfirmation}
-        onChangeText={setPasswordConfirmation}
-      />
-      <Text style={styles.smallText}>Token</Text>
-      <TextInput
-        style={styles.textInput}
-        value={token}
-        onChangeText={setToken}
-      />
-      <Text style={styles.smallText}>Steam Id</Text>
-      <TextInput
-        style={styles.textInput}
-        value={steam_id}
-        onChangeText={setSteamId}
-      />
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => handleSignUp()} >
-          <Text style={styles.buttonText}>SignUp</Text>
-        </TouchableOpacity>
+      <View style={styles.background}>
+        <Text style={styles.bigText}>Inscription</Text>
+        <Text style={styles.smallText}>Nom d'utilisateur</Text>
+        <TextInput
+          style={styles.textInput}
+          value={username}
+          onChangeText={setUsername}
+        />
+        <Text style={styles.smallText}>Mot de passe</Text>
+        <TextInput
+          style={styles.textInput}
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+        <Text style={styles.smallText}>Confirmation de mot de passe</Text>
+        <TextInput
+          style={styles.textInput}
+          secureTextEntry
+          value={passwordConfirmation}
+          onChangeText={setPasswordConfirmation}
+        />
+        <Text style={styles.smallText}>Clé API</Text>
+        <TextInput
+          style={styles.textInput}
+          value={token}
+          onChangeText={setToken}
+        />
+        <Text style={styles.smallText}>Id de votre compte Steam</Text>
+        <TextInput
+          style={styles.textInput}
+          value={steam_id}
+          onChangeText={setSteamId}
+        />
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={() => handleSignUp()}>
+            <Text style={styles.buttonText}>S'inscrire</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+
+      
     </ScrollView>
   );
 }

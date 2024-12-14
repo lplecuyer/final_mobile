@@ -102,7 +102,7 @@ export default function GameView({ navigation, route }) {
                         </Picker>
 
                         <TouchableOpacity style={styles.button} onPress={handleStatusUpdate}>
-                            <Text style={styles.saveButtonText}>Save Status</Text>
+                            <Text style={styles.saveButtonText}>Sauvegarder le status</Text>
                         </TouchableOpacity>
                     </View>
                 )}

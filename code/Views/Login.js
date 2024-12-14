@@ -20,14 +20,14 @@ export default function Login({navigation}) {
     };
   return (
     <View style={styles.background}>
-      <Text style={styles.bigText}>Login</Text>
-      <Text style={styles.smallText}>Username</Text>
+      <Text style={styles.bigText}>Connexion</Text>
+      <Text style={[styles.smallText, { marginLeft: 45 }]}>Nom d'utilisateur</Text>
       <TextInput
         style={styles.textInput}
         value={username}
         onChangeText={setUsername}
       />
-      <Text style={styles.smallText}>Password</Text>
+      <Text style={[styles.smallText, { marginLeft: 15 }]}>Mot de passe</Text>
       <TextInput
         style={styles.textInput}
         secureTextEntry
@@ -37,7 +37,7 @@ export default function Login({navigation}) {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={styles.buttonText}>Connexion</Text>
         </TouchableOpacity>
       </View>
     </View>

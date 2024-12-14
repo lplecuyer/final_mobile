@@ -1,22 +1,21 @@
 class SteamService {
-    async GetUser(APIKEY, USERID) {
+    async GetUser( stuff ) {
         try {
-            const response = await fetch(`https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${APIKEY}&steamids=${USERID}`, {
-                method: 'GET', // L'API attend une requête GET
+            const response = await fetch(`https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${stuff.token}&steamids=${stuff.steam_id}`, {
+                method: 'GET', 
             });
 
             const data = await response.json();
 
             if (data.response && data.response.players.length > 0) {
-                // Si des joueurs sont retournés
-                return data.response.players[0]; // Retourne les informations du premier joueur
+                
+                return data.response.players[0]; 
             } else {
-                // Aucun utilisateur trouvé
+                
                 throw new Error("Aucun utilisateur trouvé avec cet ID.");
             }
         } catch (error) {
-            console.error("Erreur lors de l'appel API:", error.message);
-            throw error; // Relance l'erreur pour la gestion dans le composant
+            throw new Error(error.message || "Une erreur s'est produite lors de la récupération de l'utilisateur.");
         }
     }
 

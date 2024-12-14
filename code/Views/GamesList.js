@@ -54,12 +54,12 @@ export default function GamesList({ navigation }) {
 
     return (
         <View style={styles.background}>
-            <Text style={[styles.title, { marginTop: 30 }]}> Games List </Text>
+            <Text style={[styles.title, { marginTop: 30 }]}> Liste de jeux </Text>
 
             {isLoading ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <ActivityIndicator size="large" color="#ffffff" />
-                    <Text style={styles.tinytext}>Loading...</Text>
+                    <Text style={styles.tinytext}>Chargement...</Text>
                 </View>
             ) : (
                 <>

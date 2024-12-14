@@ -34,6 +34,7 @@ class AuthService {
         }).then((r) => r.json());
 
         if (response.success)  {
+            const user = response.data[0];
             return true;
         } else {
             return false;
