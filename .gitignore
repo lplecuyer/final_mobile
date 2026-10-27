@@ -1,3 +1,9 @@
+# Tout ignorer à la racine sauf les dossiers code/ et doc/
+/*
+!/.gitignore
+!/code/
+!/doc/
+
 # Ignorer les fichiers de configuration spécifiques
 *.log
 *.env
