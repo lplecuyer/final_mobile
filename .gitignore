@@ -1,6 +1,7 @@
 # Tout ignorer à la racine sauf les dossiers code/ et doc/
 /*
 !/.gitignore
+!/README.md
 !/code/
 !/doc/
 
